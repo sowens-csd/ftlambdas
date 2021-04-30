@@ -53,15 +53,16 @@ func SaveAnalyticEvents(ftCtx awsproxy.FTContext, data string) error {
 	ftCtx.RequestLogger.Debug().Str("stream_name", streamName).Msg("Stream setup")
 	records, err := makeRecords(data)
 	if nil != err {
+		ftCtx.RequestLogger.Info().Err(err).Msg("make analytics records error")
 		return err
 	}
 	recordInput := firehose.PutRecordBatchInput{
 		DeliveryStreamName: &streamName,
 		Records:            records,
 	}
-	fhResp, err := analyticsStream.PutRecordBatch(ftCtx.Context, &recordInput)
+	_, err = analyticsStream.PutRecordBatch(ftCtx.Context, &recordInput)
 	if nil != err {
-		ftCtx.RequestLogger.Debug().Int32("fh_record_failed", *fhResp.FailedPutCount).Msg("Put analytics")
+		ftCtx.RequestLogger.Info().Err(err).Msg("put analytics error")
 	}
 	return err
 }
