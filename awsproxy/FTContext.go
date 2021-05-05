@@ -134,6 +134,7 @@ func NewFromContextAndJWT(ctx context.Context, request Request) (FTContext, *Res
 
 // NewTestContext used for test cases
 func NewTestContext(userID string, db FTDynamoAPI) FTContext {
+	zerolog.SetGlobalLevel(zerolog.ErrorLevel)
 	requestLogger := log.With().Str(requestIDLogField, testRequestID).Str(userIDLogField, userID).Logger()
 	return FTContext{
 		RequestID:     testRequestID,

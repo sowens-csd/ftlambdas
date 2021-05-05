@@ -54,7 +54,7 @@ type OnlineUser struct {
 	LastExpiryVerify      int64                     `json:"lastExpiryVerify,omitempty" dynamodbav:"lastExpiryVerify"`
 	EmailOptOut           bool                      `json:"emailOptOut" dynamodbav:"emailOptOut"`
 	EmailOptOutReason     string                    `json:"emailOptOutReason,omitempty" dynamodbav:"emailOptOutReason"`
-	Phone                 string                    `json:"phone,omitempty" dynamodbav:"phone,omitempty""`
+	Phone                 string                    `json:"phone,omitempty" dynamodbav:"phone,omitempty"`
 	CallChannel           string                    `json:"callChannel,omitempty" dynamodbav:"callChannel,omitempty"`
 	CallPeerId            string                    `json:"callPeerId,omitempty" dynamodbav:"callPeerId,omitempty"`
 	TwilioPhoneSID        string                    `json:"twilioPhoneSid,omitempty" dynamodbav:"twilioPhoneSid,omitempty"`
@@ -443,16 +443,34 @@ func (ou *OnlineUser) saveUserToDB(ctx awsproxy.FTContext) error {
 	}
 	err := ftdb.PutItem(ctx, resourceID, referenceID, ou)
 	if nil != err {
-		ctx.RequestLogger.Error().Str("user_id", ou.ID).Msg("createUser failed")
+		ctx.RequestLogger.Error().Str("userID", ou.ID).Msg("createUser failed")
 	} else {
 		ctx.RequestLogger.Info().Msg("createUser succeeded")
 	}
 	return err
 }
 
+// AcceptInvitation change the accepted flag to y
+func (ou *OnlineUser) AcceptInvitation(ctx awsproxy.FTContext) error {
+	ctx.RequestLogger.Debug().Str("userID", ou.ID).Msg("acceptInvite")
+	resourceID := ftdb.ResourceIDFromUserID(ou.ID)
+	type userUpdate struct {
+		InviteAccepted string `json:":i" dynamodbav:":i"`
+	}
+	err := ftdb.UpdateItem(ctx, resourceID, resourceID, "set inviteAccepted = :i", userUpdate{
+		InviteAccepted: UserInviteAccepted,
+	})
+	if nil != err {
+		ctx.RequestLogger.Error().Str("userID", ou.ID).Msg("accept invite failed")
+	} else {
+		ctx.RequestLogger.Info().Str("userID", ou.ID).Msg("accept invite succeeded")
+	}
+	return err
+}
+
 // Update modifies only allowed fields in the DB
 func (ou *OnlineUser) Update(ctx awsproxy.FTContext) error {
-	ctx.RequestLogger.Debug().Str("user_id", ou.ID).Str("name", ou.Name).Bool("OptOut", ou.EmailOptOut).Msg("Updating to")
+	ctx.RequestLogger.Debug().Str("userID", ou.ID).Str("name", ou.Name).Bool("OptOut", ou.EmailOptOut).Msg("Updating to")
 	resourceID := ftdb.ResourceIDFromUserID(ou.ID)
 	type userUpdate struct {
 		Name        string `json:":d" dynamodbav:":d"`
@@ -480,7 +498,7 @@ func (ou *OnlineUser) Update(ctx awsproxy.FTContext) error {
 	})
 
 	if nil != err {
-		ctx.RequestLogger.Error().Str("user_id", ou.ID).Msg("Update user failed")
+		ctx.RequestLogger.Error().Str("userID", ou.ID).Msg("Update user failed")
 	} else {
 		ctx.RequestLogger.Info().Msg("Update user succeeded")
 	}

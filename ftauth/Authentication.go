@@ -273,6 +273,7 @@ func VerifySignup(ftCtx awsproxy.FTContext, requestID string) (VerifyResponse, e
 	if req.AddDevice && len(req.AuthToken) == 0 {
 		return VerifyResponse{Verified: false, WaitingForVerification: true}, nil
 	}
+	// This is a new user
 	if len(req.ID) == 0 {
 		ftCtx.RequestLogger.Debug().Str("req", requestID).Str("email", req.Email).Msg("Auth request no user")
 		// If this is a new user send them an invite
@@ -289,13 +290,17 @@ func VerifySignup(ftCtx awsproxy.FTContext, requestID string) (VerifyResponse, e
 					return verifyResponse, err
 				}
 				ftCtx.RequestLogger.Debug().Str("req", requestID).Str("email", req.Email).Msg("Saved user")
-				if ou.AllowsEmail() {
-					ftCtx.EmailSvc.SendEmail(ftCtx.Context, ou.Email, sharing.EnglishNewUserWelcome(), ftCtx.RequestLogger)
-				}
+				sendWelcomeEmail(ftCtx, ou)
 				break
 			default:
 				ftCtx.RequestLogger.Info().Str("req", requestID).Str("email", req.Email).Msg("Error loading user")
 				return verifyResponse, err
+			}
+		} else {
+			// Existing user who's been invited but not yet accepted so we need to accept the invitation
+			if ou.IsPending() {
+				ou.AcceptInvitation(ftCtx)
+				sendWelcomeEmail(ftCtx, ou)
 			}
 		}
 		req.ID = ou.ID
@@ -321,6 +326,13 @@ func VerifySignup(ftCtx awsproxy.FTContext, requestID string) (VerifyResponse, e
 		verifyResponse.AuthToken = req.AuthToken
 	}
 	return verifyResponse, err
+}
+
+func sendWelcomeEmail(ftCtx awsproxy.FTContext, ou *sharing.OnlineUser) {
+	if ou.AllowsEmail() {
+		ftCtx.EmailSvc.SendEmail(ftCtx.Context, ou.Email, sharing.EnglishNewUserWelcome(), ftCtx.RequestLogger)
+	}
+
 }
 
 // VerifyAddDevice is responsible for taking an add device verify request from a client that
@@ -635,7 +647,7 @@ func newSignup(ftCtx awsproxy.FTContext, req signupRequest, requestID string) (S
 		hasUser := nil != ou
 		if !req.AllowSignup && !hasUser {
 			if nil != err {
-				ftCtx.RequestLogger.Err(err).Msg("no matching user, signup not allowed")
+				ftCtx.RequestLogger.Info().Err(err).Msg("no matching user, signup not allowed")
 			} else {
 				ftCtx.RequestLogger.Debug().Msg("no matching user, signup not allowed")
 			}
@@ -643,7 +655,7 @@ func newSignup(ftCtx awsproxy.FTContext, req signupRequest, requestID string) (S
 					Success: false,
 					Status:  BlockedNewSignupResponse},
 				nil
-		} else if !req.AllowSignin && hasUser {
+		} else if !req.AllowSignin && hasUser && ou.IsAccepted() {
 			ftCtx.RequestLogger.Debug().Msg("found user, signin not allowed")
 			return SignupResponse{
 					Success: false,

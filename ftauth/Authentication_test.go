@@ -8,6 +8,7 @@ import (
 
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 	"github.com/sowens-csd/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/sharing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -29,10 +30,33 @@ var authTestDBData = awsproxy.TestDBData{
 		ReferenceID: ftdb.ReferenceIDFromUserID(userID1),
 		QueryKey:    email1,
 		Record: map[string]interface{}{
-			ftdb.ResourceIDField:  ftdb.ResourceIDFromUserID(userID1),
-			ftdb.ReferenceIDField: ftdb.ReferenceIDFromUserID(userID1),
-			ftdb.IDField:          userID1,
-			ftdb.EmailField:       email1,
+			ftdb.ResourceIDField:     ftdb.ResourceIDFromUserID(userID1),
+			ftdb.ReferenceIDField:    ftdb.ReferenceIDFromUserID(userID1),
+			ftdb.IDField:             userID1,
+			ftdb.EmailField:          email1,
+			ftdb.InviteAcceptedField: sharing.UserInviteAccepted,
+		},
+	},
+	awsproxy.TestDBDataRecord{
+		ResourceID:  ftdb.ResourceIDFromUserID(invitedUserID),
+		ReferenceID: ftdb.ReferenceIDFromUserID(invitedUserID),
+		QueryKey:    invitedEmail,
+		Record: map[string]interface{}{
+			ftdb.ResourceIDField:  ftdb.ResourceIDFromUserID(invitedUserID),
+			ftdb.ReferenceIDField: ftdb.ReferenceIDFromUserID(invitedUserID),
+			ftdb.IDField:          invitedUserID,
+			ftdb.EmailField:       invitedEmail,
+		},
+	},
+	awsproxy.TestDBDataRecord{
+		ResourceID:  ftdb.ResourceIDFromUserID(invitedSignupUserID),
+		ReferenceID: ftdb.ReferenceIDFromUserID(invitedSignupUserID),
+		QueryKey:    invitedSignupEmail,
+		Record: map[string]interface{}{
+			ftdb.ResourceIDField:  ftdb.ResourceIDFromUserID(invitedSignupUserID),
+			ftdb.ReferenceIDField: ftdb.ReferenceIDFromUserID(invitedSignupUserID),
+			ftdb.IDField:          invitedSignupUserID,
+			ftdb.EmailField:       invitedSignupEmail,
 		},
 	},
 	awsproxy.TestDBDataRecord{
@@ -56,6 +80,26 @@ var authTestDBData = awsproxy.TestDBData{
 			ftdb.EmailField:       newUserEmail,
 		},
 	},
+	awsproxy.TestDBDataRecord{
+		ResourceID:  ftdb.ResourceIDForAuthRequest(),
+		ReferenceID: ftdb.ReferenceIDFromAuthRequestID(invitedUserRequestID1),
+		QueryKey:    newUserEmail,
+		Record: map[string]interface{}{
+			ftdb.ResourceIDField:  ftdb.ResourceIDForAuthRequest(),
+			ftdb.ReferenceIDField: ftdb.ReferenceIDFromAuthRequestID(invitedUserRequestID1),
+			ftdb.EmailField:       invitedEmail,
+		},
+	},
+	awsproxy.TestDBDataRecord{
+		ResourceID:  ftdb.ResourceIDForAuthRequest(),
+		ReferenceID: ftdb.ReferenceIDFromAuthRequestID(invitedSignupRequestID),
+		QueryKey:    invitedSignupEmail,
+		Record: map[string]interface{}{
+			ftdb.ResourceIDField:  ftdb.ResourceIDForAuthRequest(),
+			ftdb.ReferenceIDField: ftdb.ReferenceIDFromAuthRequestID(invitedSignupRequestID),
+			ftdb.EmailField:       invitedSignupEmail,
+		},
+	},
 }
 
 func TestSignupFailsWithInvalidEmail(t *testing.T) {
@@ -75,6 +119,11 @@ func TestSignupFailsForNewAccountWhenSignupNotAllowed(t *testing.T) {
 func TestSignupFailsForExistingAccountWhenSigninNotAllowed(t *testing.T) {
 	signupAndExpect(signupRequest{Email: email1, AllowSignup: true, AllowSignin: false, AuthToken: token1},
 		false, false, "Not blocked", t)
+}
+
+func TestSignupSucceedsForInvitedAccountWithSigninNotAllowed(t *testing.T) {
+	signupAndExpect(signupRequest{Email: invitedEmail, AllowSignup: true, AllowSignin: false, AuthToken: invitedToken},
+		false, true, "blocked", t)
 }
 
 func TestAddDeviceSucceedsForExistingAccount(t *testing.T) {
@@ -127,6 +176,25 @@ func TestVerifySucceedsForNewUser(t *testing.T) {
 	}
 	if !resp.Verified {
 		t.Fatal("Should have been verified")
+	}
+}
+
+func TestVerifySucceedsForInvitedUser(t *testing.T) {
+	testDB := awsproxy.NewTestDBSvcWithData(authTestDBData)
+	ftCtx := awsproxy.NewTestContext(invitedUserID, testDB)
+	resp, err := VerifySignup(ftCtx, invitedUserRequestID1)
+	if nil != err {
+		t.Fatal("Should have succeeded")
+	}
+	if !resp.Verified {
+		t.Fatal("Should have been verified")
+	}
+	var ou sharing.OnlineUser
+	ok, err := ftdb.GetItem(ftCtx, ftdb.ResourceIDFromUserID(invitedUserID), ftdb.ReferenceIDFromUserID(invitedUserID), &ou)
+	if nil == err && ok {
+		testDB.ExpectUpdateCount(1, t)
+	} else {
+		t.Fatal("Should have succeeded")
 	}
 }
 

@@ -29,7 +29,7 @@ type StoryGroup struct {
 	BaseVersion   string `json:"baseVersion" dynamodbav:"baseVersion"`
 	LastUpdated   int    `json:"lastUpdated" dynamodbav:"lastUpdated"`
 	LastUpdatedBy string `json:"lastUpdatedBy" dynamodbav:"lastUpdatedBy"`
-	Status        string `json:"status" dynamodbav:""`
+	Status        string `json:"status" dynamodbav:"status"`
 }
 
 // SharedStory is the content for a single story
