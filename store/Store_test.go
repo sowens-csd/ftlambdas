@@ -41,6 +41,8 @@ func TestSMSReceiptConvert(t *testing.T) {
 	fmt.Println(base64.StdEncoding.EncodeToString([]byte(smsResponse1)))
 	fmt.Println("SMS Response2: ")
 	fmt.Println(base64.StdEncoding.EncodeToString([]byte(smsResponse2)))
+	fmt.Println("Invited User Response: ")
+	fmt.Println(base64.StdEncoding.EncodeToString([]byte(sharingInvitedResponse)))
 }
 
 func TestMockAppleRequestSuccessful(t *testing.T) {
