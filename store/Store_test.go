@@ -39,10 +39,14 @@ func TestAppleRequestSuccessful(t *testing.T) {
 func TestSMSReceiptConvert(t *testing.T) {
 	fmt.Println("SMS Response1: ")
 	fmt.Println(base64.StdEncoding.EncodeToString([]byte(smsResponse1)))
-	fmt.Println("SMS Response2: ")
+	fmt.Println("\nSMS Response2: ")
 	fmt.Println(base64.StdEncoding.EncodeToString([]byte(smsResponse2)))
-	fmt.Println("Invited User Response: ")
+	fmt.Println("\nInvited User Response: ")
 	fmt.Println(base64.StdEncoding.EncodeToString([]byte(sharingInvitedResponse)))
+	fmt.Println("\nAuto1 User Response: ")
+	fmt.Println(base64.StdEncoding.EncodeToString([]byte(auto1Response)))
+	fmt.Println("\nAuto2 User Response: ")
+	fmt.Println(base64.StdEncoding.EncodeToString([]byte(auto2Response)))
 }
 
 func TestMockAppleRequestSuccessful(t *testing.T) {
