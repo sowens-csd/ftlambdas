@@ -10,8 +10,7 @@ import (
 func EnglishAuthCodeContent(authCode string) awsproxy.EmailContent {
 	return awsproxy.EmailContent{
 		Subject: "Folktells Account Verification",
-		TextBody: fmt.Sprintf(`We received a request to reset your account. Please copy this verification code and paste it into Folktells. 
-
+		TextBody: fmt.Sprintf(`Your Folktells verification code is: 
 %s
 
 To protect the security of your account, DO NOT give this code to anyone else. If you did not make this request, delete this email. This code will expire in 2 hours.
