@@ -77,8 +77,9 @@ type commandDetails struct {
 }
 
 type pushNotification struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
+	Title string `json:"title,omitempty"`
+	Body  string `json:"body,omitempty"`
+	Badge string `json:"badge,omitempty"`
 }
 
 type commandNotification struct {
@@ -112,6 +113,9 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 		return err
 	}
 
+	if len(notification.PushNotification.Badge) == 0 && len(notification.PushNotification.Title) == 0 && len(notification.PushNotification.Badge) == 0 {
+		notification.PushNotification.Badge = "0"
+	}
 	structuredContent, _ := json.Marshal(&notification)
 	gcm := googleCloudMessage{GCM: string(structuredContent)}
 	msgContent, _ := json.Marshal(&gcm)
@@ -213,7 +217,7 @@ func Send(ftCtx awsproxy.FTContext, message string, onlineUser *sharing.OnlineUs
 	ftCtx.RequestLogger.Debug().Msg("Send message")
 	snsClient := getSNSClient(ftCtx)
 	for _, deviceToken := range onlineUser.DeviceTokens {
-		ftCtx.RequestLogger.Debug().Str("message", message).Str("appID", deviceToken.AppInstallID).Str("SNSEndpoint", deviceToken.SNSEndpoint).Msg("Publish to")
+		ftCtx.RequestLogger.Debug().Str("gcmMessage", message).Str("appID", deviceToken.AppInstallID).Str("SNSEndpoint", deviceToken.SNSEndpoint).Msg("Publish to")
 		input := &sns.PublishInput{
 			MessageStructure: aws.String("json"),
 			Message:          aws.String(message),
