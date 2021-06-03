@@ -113,7 +113,9 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 		return err
 	}
 
-	if len(notification.PushNotification.Badge) == 0 && len(notification.PushNotification.Title) == 0 && len(notification.PushNotification.Badge) == 0 {
+	if nil == notification.PushNotification {
+		notification.PushNotification = &pushNotification{Badge: "0"}
+	} else if len(notification.PushNotification.Badge) == 0 && len(notification.PushNotification.Title) == 0 && len(notification.PushNotification.Badge) == 0 {
 		notification.PushNotification.Badge = "0"
 	}
 	structuredContent, _ := json.Marshal(&notification)
