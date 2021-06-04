@@ -22,6 +22,7 @@ var plivoSecret = ""
 var jwePassphrase = ""
 var webrtcAccessToken = ""
 var webrtcSecret = ""
+var fcmKey = ""
 var initialized = false
 var parameterStore ParameterStore
 
@@ -46,6 +47,8 @@ const plivoSecretPath = "/plivo/secret"
 
 const webrtcAccessTokenPath = "/webrtc/access"
 const webrtcSecretPath = "/webrtc/secret"
+
+const fcmKeyPath = "/fcm/secret"
 
 // JWE
 const jwePassphrasePath = "/jwe/passphrase"
@@ -78,6 +81,15 @@ func PlivoAppSID() string {
 // SetupAccessParameters first or they will be empty
 func WebRTCParameters() (string, string) {
 	return webrtcAccessToken, webrtcSecret
+}
+
+// FCMParameters returns the current values of the FCM parameters, always call
+// SetupAccessParameters first or they will be empty
+func FCMParameters(ctx context.Context) string {
+	if len(fcmKey) == 0 {
+		fcmKey = getParameter(ctx, fcmKeyPath)
+	}
+	return fcmKey
 }
 
 // SetJWEParameters useful for testing to control the values
