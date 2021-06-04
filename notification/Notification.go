@@ -89,6 +89,7 @@ type commandNotification struct {
 }
 
 type fcmCommandNotification struct {
+	To               string            `json:"to"`
 	ContentAvailable *bool             `json:"content_available,omitempty"`
 	APNSPriority     *int              `json:"apns-priority,omitempty"`
 	Data             commandDetails    `json:"data"`
@@ -252,30 +253,32 @@ func SendFCM(ftCtx awsproxy.FTContext, notification commandNotification, onlineU
 	} else {
 		fcm.PushNotification = notification.PushNotification
 	}
-	buf := new(bytes.Buffer)
-	err := json.NewEncoder(buf).Encode(fcm)
-	if nil != err {
-		return err
-	}
-	ftCtx.RequestLogger.Debug().Str("payload", buf.String()).Msg("posting to fcm")
-	req, err := http.NewRequest(http.MethodPost, "https://fcm.googleapis.com/fcm/send", bytes.NewReader(buf.Bytes()))
-	if nil != err {
-		return err
-	}
-	fcmKey := awsproxy.FCMParameters(ftCtx.Context)
-	if len(fcmKey) == 0 {
-		return fmt.Errorf("fcmKey environment variable not present")
-	}
-	req.Header.Add("Authorization", fmt.Sprintf("key=%s", fcmKey))
-	req.Header.Add("Content-Type", "application/json")
-	resp, err := client.Do(req)
-	if nil != err {
-		return err
-	}
-	defer resp.Body.Close()
-	ftCtx.RequestLogger.Info().Msg(fmt.Sprintf("HTTP Status on verify call %d", resp.StatusCode))
-	if http.StatusOK != resp.StatusCode {
-		return fmt.Errorf("Non 200 status %d", resp.StatusCode)
+	for _, device := range onlineUser.DeviceTokens {
+		fcm.To = device.NotificationToken
+		buf := new(bytes.Buffer)
+		err := json.NewEncoder(buf).Encode(fcm)
+		if nil != err {
+			return err
+		}
+		ftCtx.RequestLogger.Debug().Str("payload", buf.String()).Msg("posting to fcm")
+		req, err := http.NewRequest(http.MethodPost, "https://fcm.googleapis.com/fcm/send", bytes.NewReader(buf.Bytes()))
+		if nil != err {
+			return err
+		}
+		fcmKey := awsproxy.FCMParameters(ftCtx.Context)
+		if len(fcmKey) == 0 {
+			return fmt.Errorf("fcmKey environment variable not present")
+		}
+		req.Header.Add("Authorization", fmt.Sprintf("key=%s", fcmKey))
+		req.Header.Add("Content-Type", "application/json")
+		resp, err := client.Do(req)
+		if nil != err {
+			return err
+		}
+		defer resp.Body.Close()
+		if http.StatusOK != resp.StatusCode {
+			ftCtx.RequestLogger.Info().Int("httpStatus", resp.StatusCode).Str("token", device.NotificationToken).Msg("send failed")
+		}
 	}
 	return nil
 }
