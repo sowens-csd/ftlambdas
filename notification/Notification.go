@@ -126,7 +126,7 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 	} else if len(notification.PushNotification.Badge) == 0 && len(notification.PushNotification.Title) == 0 && len(notification.PushNotification.Badge) == 0 {
 		notification.PushNotification.Badge = "0"
 	}
-	err = SendFCM(ftCtx, notification, destinationUser, client)
+	err = SendFCM(ftCtx, notification, destinationUser, &http.Client{Timeout: 30 * time.Second})
 
 	// structuredContent, _ := json.Marshal(&notification)
 	// gcm := googleCloudMessage{GCM: string(structuredContent)}
