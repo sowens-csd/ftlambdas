@@ -24,6 +24,7 @@ var webrtcAccessToken = ""
 var webrtcSecret = ""
 var fcmKey = ""
 var initialized = false
+var storeInitialized = false
 var parameterStore ParameterStore
 
 // When adding a value here the resource permissions in serverless.yml may also have to be updated
@@ -86,6 +87,8 @@ func WebRTCParameters() (string, string) {
 // FCMParameters returns the current values of the FCM parameters, always call
 // SetupAccessParameters first or they will be empty
 func FCMParameters(ctx context.Context) string {
+	SetupParameterStore(ctx)
+
 	if len(fcmKey) == 0 {
 		fcmKey = getParameter(ctx, fcmKeyPath)
 	}
@@ -111,10 +114,8 @@ func UpdateAccessToken(ctx context.Context, updatedToken string) {
 	}
 }
 
-// SetupAccessParameters sets the internal access params based on values from the AWS
-// ParameterStore
-func SetupAccessParameters(ctx context.Context) {
-	if initialized {
+func SetupParameterStore(ctx context.Context) {
+	if storeInitialized {
 		return
 	}
 	cfg, err := config.LoadDefaultConfig(ctx)
@@ -122,6 +123,16 @@ func SetupAccessParameters(ctx context.Context) {
 		panic("Could not load AWS config")
 	}
 	parameterStore = NewParameterStore(cfg)
+	storeInitialized = true
+}
+
+// SetupAccessParameters sets the internal access params based on values from the AWS
+// ParameterStore
+func SetupAccessParameters(ctx context.Context) {
+	if initialized {
+		return
+	}
+	SetupParameterStore(ctx)
 	initialized = true
 	connectPassword = getParameter(ctx, connectPasswordPath)
 	clientSecret = getParameter(ctx, clientSecretPath)
