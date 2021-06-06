@@ -92,7 +92,7 @@ type fcmCommandNotification struct {
 	To               string            `json:"to"`
 	ContentAvailable *bool             `json:"content_available,omitempty"`
 	APNSPriority     *int              `json:"apns-priority,omitempty"`
-	Data             commandDetails    `json:"data"`
+	Data             *interface{}      `json:"data,omitempty"`
 	PushNotification *pushNotification `json:"notification,omitempty"`
 }
 
@@ -122,12 +122,7 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 		return err
 	}
 
-	if nil == notification.PushNotification {
-		notification.PushNotification = &pushNotification{Badge: "0"}
-	} else if len(notification.PushNotification.Badge) == 0 && len(notification.PushNotification.Title) == 0 && len(notification.PushNotification.Badge) == 0 {
-		notification.PushNotification.Badge = "0"
-	}
-	err = SendFCM(ftCtx, notification, destinationUser, &http.Client{Timeout: 30 * time.Second})
+	err = SendFCM(ftCtx, notification.Data, notification.PushNotification, destinationUser, &http.Client{Timeout: 30 * time.Second})
 
 	// structuredContent, _ := json.Marshal(&notification)
 	// gcm := googleCloudMessage{GCM: string(structuredContent)}
@@ -138,7 +133,7 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 }
 
 // SendAuthVerifyCommand creates a new push notification that represents a remote command
-func SendAuthVerifyCommand(ftCtx awsproxy.FTContext, requestID string, destinationUser *sharing.OnlineUser) error {
+func SendAuthVerifyCommand(ftCtx awsproxy.FTContext, requestID string, destinationUser *sharing.OnlineUser, client *http.Client) error {
 	var notification = commandNotification{
 		Data: commandDetails{
 			NotificationType: "remoteCommand",
@@ -153,34 +148,22 @@ func SendAuthVerifyCommand(ftCtx awsproxy.FTContext, requestID string, destinati
 		},
 	}
 
-	structuredContent, _ := json.Marshal(&notification)
-	gcm := googleCloudMessage{GCM: string(structuredContent)}
-	msgContent, _ := json.Marshal(&gcm)
-	strContent := string(msgContent)
-	Send(ftCtx, strContent, destinationUser)
-	return nil
+	return SendFCM(ftCtx, notification.Data, notification.PushNotification, destinationUser, client)
 }
 
 // SendAlert creates a new push notification that represents a notification to display
-func SendAlert(ftCtx awsproxy.FTContext, title, alert string, destinationUser *sharing.OnlineUser) error {
+func SendAlert(ftCtx awsproxy.FTContext, title, alert string, destinationUser *sharing.OnlineUser, client *http.Client) error {
 	var notification = commandNotification{
 		PushNotification: &pushNotification{
 			Title: title,
 			Body:  alert,
 		},
 	}
-
-	structuredContent, _ := json.Marshal(&notification)
-	gcm := googleCloudMessage{GCM: string(structuredContent)}
-	msgContent, _ := json.Marshal(&gcm)
-	strContent := string(msgContent)
-	Send(ftCtx, strContent, destinationUser)
-	return nil
-
+	return SendFCM(ftCtx, nil, notification.PushNotification, destinationUser, client)
 }
 
 // SendStoryChangeCommand creates a new push notification that represents a remote command
-func SendStoryChangeCommand(ftCtx awsproxy.FTContext, storyID string, destinationUser *sharing.OnlineUser) error {
+func SendStoryChangeCommand(ftCtx awsproxy.FTContext, storyID string, destinationUser *sharing.OnlineUser, client *http.Client) error {
 	var notification = commandNotification{
 		Data: commandDetails{
 			NotificationType: "remoteCommand",
@@ -196,13 +179,7 @@ func SendStoryChangeCommand(ftCtx awsproxy.FTContext, storyID string, destinatio
 	}
 
 	ftCtx.RequestLogger.Debug().Str("storyID", storyID).Msg("Building notification")
-	structuredContent, _ := json.Marshal(&notification)
-	gcm := googleCloudMessage{GCM: string(structuredContent)}
-	msgContent, _ := json.Marshal(&gcm)
-	strContent := string(msgContent)
-	ftCtx.RequestLogger.Debug().Str("storyID", storyID).Msg("Sending notification")
-	Send(ftCtx, strContent, destinationUser)
-	return nil
+	return SendFCM(ftCtx, notification.Data, notification.PushNotification, destinationUser, client)
 }
 
 // SendFromSMS creates a new push notification based on the information in the provided SMS
@@ -213,16 +190,11 @@ func SendFromSMS(ftCtx awsproxy.FTContext, smsData string, client *http.Client) 
 	if nil != err {
 		return err
 	}
-	onlineUser, err := sharing.LoadOnlineUserByPhone(ftCtx, smsDetails.SentTo)
+	destinationUser, err := sharing.LoadOnlineUserByPhone(ftCtx, smsDetails.SentTo)
 	if nil != err {
 		return err
 	}
-	msgContent, err := buildMessageContent(*smsDetails)
-	if nil != err {
-		return err
-	}
-	Send(ftCtx, msgContent, onlineUser)
-	return nil
+	return SendFCM(ftCtx, smsDetails, nil, destinationUser, client)
 }
 
 // Send a notification to the endpoints for this user
@@ -243,15 +215,18 @@ func Send(ftCtx awsproxy.FTContext, message string, onlineUser *sharing.OnlineUs
 	}
 }
 
-func SendFCM(ftCtx awsproxy.FTContext, notification commandNotification, onlineUser *sharing.OnlineUser, client *http.Client) error {
-	fcm := fcmCommandNotification{Data: notification.Data}
-	if nil == notification.PushNotification {
+func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushNotification, onlineUser *sharing.OnlineUser, client *http.Client) error {
+	fcm := fcmCommandNotification{}
+	if nil != data {
+		fcm.Data = &data
+	}
+	if nil == pushNotification {
 		normal := 5
 		contentAvailable := true
 		fcm.APNSPriority = &normal
 		fcm.ContentAvailable = &contentAvailable
 	} else {
-		fcm.PushNotification = notification.PushNotification
+		fcm.PushNotification = pushNotification
 	}
 	for _, device := range onlineUser.DeviceTokens {
 		fcm.To = device.NotificationToken
@@ -281,14 +256,6 @@ func SendFCM(ftCtx awsproxy.FTContext, notification commandNotification, onlineU
 		}
 	}
 	return nil
-}
-
-func buildMessageContent(sms smsDetails) (string, error) {
-	smsNotify := smsNotification{Data: sms}
-	structuredContent, _ := json.Marshal(&smsNotify)
-	gcm := googleCloudMessage{GCM: string(structuredContent)}
-	msgContent, _ := json.Marshal(&gcm)
-	return string(msgContent), nil
 }
 
 func buildSmsDetails(ftCtx awsproxy.FTContext, smsData string) (*smsDetails, error) {
