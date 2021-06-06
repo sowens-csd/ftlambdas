@@ -2,6 +2,7 @@ package ftlambdas
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 	"github.com/sowens-csd/ftlambdas/ftauth"
@@ -35,7 +36,7 @@ func UpdateOrDeleteUser(ftCtx awsproxy.FTContext, onlineUserJSON string) error {
 
 // UpdateStoryAndNotify updates the DB with the new state of the shared story and
 // nofifies affected users.
-func UpdateStoryAndNotify(ftCtx awsproxy.FTContext, storyShareJSON string) (sharing.StoryUpdateResult, error) {
+func UpdateStoryAndNotify(ftCtx awsproxy.FTContext, storyShareJSON string, client *http.Client) (sharing.StoryUpdateResult, error) {
 	inputJSON := []byte(storyShareJSON)
 	var sharedStory sharing.SharedStory
 	err := json.Unmarshal(inputJSON, &sharedStory)
@@ -44,12 +45,12 @@ func UpdateStoryAndNotify(ftCtx awsproxy.FTContext, storyShareJSON string) (shar
 	}
 	result, err := sharing.UpdateSharedStory(ftCtx, sharedStory)
 	if result.Success && nil != sharedStory.Groups {
-		notifyAffectedUsers(ftCtx, sharedStory)
+		notifyAffectedUsers(ftCtx, sharedStory, client)
 	}
 	return result, err
 }
 
-func notifyAffectedUsers(ftCtx awsproxy.FTContext, sharedStory sharing.SharedStory) {
+func notifyAffectedUsers(ftCtx awsproxy.FTContext, sharedStory sharing.SharedStory, client *http.Client) {
 	for _, group := range sharedStory.Groups {
 		ftCtx.RequestLogger.Debug().Str("groupID", group.GroupID).Msg("Getting group users")
 		users, err := sharing.FindOnlineUsersForGroup(ftCtx, group.GroupID)
@@ -59,7 +60,7 @@ func notifyAffectedUsers(ftCtx awsproxy.FTContext, sharedStory sharing.SharedSto
 				ftCtx.RequestLogger.Debug().Str("userID", user.ID).Msg("Checking user")
 				if user.ID != ftCtx.UserID {
 					ftCtx.RequestLogger.Debug().Str("userID", user.ID).Msg("Notifying user")
-					notification.SendStoryChangeCommand(ftCtx, sharedStory.StoryID, user)
+					notification.SendStoryChangeCommand(ftCtx, sharedStory.StoryID, user, client)
 					ftCtx.RequestLogger.Debug().Str("userID", user.ID).Msg("Notified user")
 				}
 			}

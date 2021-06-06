@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	mrand "math/rand"
+	"net/http"
 	"regexp"
 	"strings"
 	"time"
@@ -503,7 +504,7 @@ func findSignupRequest(ftCtx awsproxy.FTContext, email, token string) (*signupRe
 // back to VerifySignup confirms ownership of the email address and converts the provisional
 // association of the token into a verified association. At that point it also checks to
 // see if there is a user account already, and if it had a previous token.
-func Signup(ftCtx awsproxy.FTContext, signupJSON string) (SignupResponse, error) {
+func Signup(ftCtx awsproxy.FTContext, signupJSON string, client *http.Client) (SignupResponse, error) {
 	signupResponse := SignupResponse{Success: false}
 	var req signupRequest
 	err := json.Unmarshal([]byte(signupJSON), &req)
@@ -523,7 +524,7 @@ func Signup(ftCtx awsproxy.FTContext, signupJSON string) (SignupResponse, error)
 
 		}
 		if req.AddDevice {
-			return addDeviceSignup(ftCtx, req, requestID)
+			return addDeviceSignup(ftCtx, req, requestID, client)
 		}
 		return newSignup(ftCtx, req, requestID)
 
@@ -571,7 +572,7 @@ func deleteExistingAuth(ftCtx awsproxy.FTContext, resID, userID string) {
 // approves the request. This method also sends a push notification
 // to an existing device of the user so that they can approve the
 // request in Folktells.
-func addDeviceSignup(ftCtx awsproxy.FTContext, req signupRequest, requestID string) (SignupResponse, error) {
+func addDeviceSignup(ftCtx awsproxy.FTContext, req signupRequest, requestID string, client *http.Client) (SignupResponse, error) {
 	ftCtx.RequestLogger.Debug().Msg("addDeviceSignup")
 	signupResponse := SignupResponse{Success: false}
 	result, err := ftCtx.DBSvc.Query(ftCtx.Context, &dynamodb.QueryInput{
@@ -622,7 +623,7 @@ func addDeviceSignup(ftCtx awsproxy.FTContext, req signupRequest, requestID stri
 		if nil != err {
 			return signupResponse, err
 		}
-		notification.SendAuthVerifyCommand(ftCtx, requestID, ou)
+		notification.SendAuthVerifyCommand(ftCtx, requestID, ou, client)
 	}
 	return SignupResponse{Status: 0, Success: true, RequestID: requestID}, nil
 }

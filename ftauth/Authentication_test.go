@@ -1,8 +1,11 @@
 package ftauth
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"testing"
 	"time"
 
@@ -132,10 +135,17 @@ func TestAddDeviceSucceedsForExistingAccount(t *testing.T) {
 }
 
 func signupAndExpect(request signupRequest, hasError, succeeds bool, msg string, t *testing.T) {
+	client := NewTestClient(func(req *http.Request) *http.Response {
+		return &http.Response{
+			StatusCode: 200,
+			Body:       ioutil.NopCloser(bytes.NewBufferString("Ok")),
+			Header:     make(http.Header),
+		}
+	})
 	testDB := awsproxy.NewTestDBSvcWithData(authTestDBData)
 	ftCtx := awsproxy.NewTestContext(userID1, testDB)
 	req, _ := json.Marshal(request)
-	resp, err := Signup(ftCtx, string(req))
+	resp, err := Signup(ftCtx, string(req), client)
 	if hasError && nil == err {
 		t.Fatalf(msg)
 	} else if !hasError && nil != err {
@@ -245,4 +255,19 @@ func TestHashWorks(t *testing.T) {
 	require.NoError(t, err)
 	err = compareHashedAuthComponent(ftCtx, hashed, token1)
 	require.NoError(t, err)
+}
+
+// RoundTripFunc .
+type RoundTripFunc func(req *http.Request) *http.Response
+
+// RoundTrip .
+func (f RoundTripFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req), nil
+}
+
+//NewTestClient returns *http.Client with Transport replaced to avoid making real calls
+func NewTestClient(fn RoundTripFunc) *http.Client {
+	return &http.Client{
+		Transport: RoundTripFunc(fn),
+	}
 }
