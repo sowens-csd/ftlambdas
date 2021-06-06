@@ -13,8 +13,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/firehose v1.2.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/kinesisvideo v1.1.5 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ses v1.3.1
-	github.com/aws/aws-sdk-go-v2/service/sns v1.4.1
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.6.1
+	github.com/aws/aws-sdk-go-v2/service/sns v1.5.0
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.6.2
 	github.com/aws/smithy-go v1.4.0
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/plivo/plivo-go v5.5.2+incompatible
@@ -24,5 +24,5 @@ require (
 	github.com/stretchr/testify v1.6.1
 	github.com/urfave/cli v1.21.0 // indirect
 	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	gopkg.in/square/go-jose.v2 v2.5.1
+	gopkg.in/square/go-jose.v2 v2.6.0
 )
