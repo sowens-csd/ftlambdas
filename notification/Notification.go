@@ -275,7 +275,8 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 				inputJSON := []byte(string(stringBody))
 				var fcmResponse googleCloudResponse
 				err = json.Unmarshal(inputJSON, &fcmResponse)
-				if nil != err && fcmResponse.Failure > 0 && len(fcmResponse.Results) > 0 {
+				if nil == err && fcmResponse.Failure > 0 && len(fcmResponse.Results) > 0 {
+					ftCtx.RequestLogger.Debug().Int("success", fcmResponse.Success).Int("failure", fcmResponse.Failure).Str("token", device.NotificationToken).Str("error", fcmResponse.Results[0].Error).Msg("got valid response")
 					switch fcmResponse.Results[0].Error {
 					case "error:MissingRegistration":
 					case "error:InvalidRegistration":
@@ -285,14 +286,17 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 						ftCtx.RequestLogger.Debug().Str("error", fcmResponse.Results[0].Error).Str("token", device.NotificationToken).Msg("bad token")
 						break
 					default:
+						ftCtx.RequestLogger.Debug().Str("error", fcmResponse.Results[0].Error).Str("token", device.NotificationToken).Msg("good token")
 						goodTokens = append(goodTokens, device)
 						break
 					}
 				} else {
+					ftCtx.RequestLogger.Debug().Int("success", fcmResponse.Success).Int("failure", fcmResponse.Failure).Str("token", device.NotificationToken).Str("error", fcmResponse.Results[0].Error).Msg("good token, no failures or..")
 					goodTokens = append(goodTokens, device)
 				}
 			} else {
-				ftCtx.RequestLogger.Error().Err(err).Str("token", device.NotificationToken).Msg("error reading response")
+				ftCtx.RequestLogger.Error().Err(err).Str("token", device.NotificationToken).Msg("good token, error reading response")
+				goodTokens = append(goodTokens, device)
 			}
 		} else {
 			ftCtx.RequestLogger.Info().Int("httpStatus", resp.StatusCode).Str("token", device.NotificationToken).Msg("send failed")
@@ -300,7 +304,7 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 		}
 	}
 	if len(goodTokens) != len(onlineUser.DeviceTokens) {
-		ftCtx.RequestLogger.Debug().Msg("updating user tokens")
+		ftCtx.RequestLogger.Debug().Int("good", len(goodTokens)).Int("current", len(onlineUser.DeviceTokens)).Msg("updating user tokens")
 		onlineUser.DeviceTokens = goodTokens
 		onlineUser.UpdateDeviceTokens(ftCtx)
 	}
