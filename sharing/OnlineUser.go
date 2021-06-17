@@ -510,7 +510,7 @@ func (ou *OnlineUser) UpdateDeviceTokens(ctx awsproxy.FTContext) error {
 	ctx.RequestLogger.Debug().Msg("updating device tokens")
 	resourceID := ftdb.ResourceIDFromUserID(ou.ID)
 	type deviceTokenUpdate struct {
-		DeviceTokens []DeviceNotificationToken `json:"deviceTokens,omitempty" dynamodbav:"deviceTokens,omitempty"`
+		DeviceTokens []DeviceNotificationToken `json:":d,omitempty" dynamodbav:":d,omitempty"`
 	}
 	err := ftdb.UpdateItem(ctx, resourceID, resourceID, "set deviceTokens = :d", deviceTokenUpdate{
 		DeviceTokens: ou.DeviceTokens,
