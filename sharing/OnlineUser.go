@@ -498,9 +498,27 @@ func (ou *OnlineUser) Update(ctx awsproxy.FTContext) error {
 	})
 
 	if nil != err {
-		ctx.RequestLogger.Error().Str("userID", ou.ID).Msg("Update user failed")
+		ctx.RequestLogger.Error().Err(err).Str("userID", ou.ID).Msg("update user failed")
 	} else {
 		ctx.RequestLogger.Info().Msg("Update user succeeded")
+	}
+	return err
+}
+
+// Update modifies only allowed fields in the DB
+func (ou *OnlineUser) UpdateDeviceTokens(ctx awsproxy.FTContext) error {
+	ctx.RequestLogger.Debug().Msg("updating device tokens")
+	resourceID := ftdb.ResourceIDFromUserID(ou.ID)
+	type deviceTokenUpdate struct {
+		DeviceTokens []DeviceNotificationToken `json:"deviceTokens,omitempty" dynamodbav:"deviceTokens,omitempty"`
+	}
+	err := ftdb.UpdateItem(ctx, resourceID, resourceID, "set deviceTokens = :d", deviceTokenUpdate{
+		DeviceTokens: ou.DeviceTokens,
+	})
+	if nil != err {
+		ctx.RequestLogger.Error().Err(err).Str("userID", ou.ID).Msg("update device tokens failed")
+	} else {
+		ctx.RequestLogger.Debug().Msg("update device tokens succeeded")
 	}
 	return err
 }

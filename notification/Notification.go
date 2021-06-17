@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -16,6 +17,18 @@ import (
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 	"github.com/sowens-csd/ftlambdas/sharing"
 )
+
+type googleCloudResult struct {
+	MessageId string `json:"message_id,omitempty"`
+	Error     string `json:"error,omitempty"`
+}
+
+type googleCloudResponse struct {
+	MulticastID int64               `json:"multicast_id"`
+	Success     int                 `json:"success"`
+	Failure     int                 `json:"failure"`
+	Results     []googleCloudResult `json:"results"`
+}
 
 type googleCloudMessage struct {
 	GCM string
@@ -228,6 +241,10 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 	} else {
 		fcm.PushNotification = pushNotification
 	}
+	// After the send this array will hold all of the tokens that successfully delivered
+	// a message to a device. If it doesn't match the user's current token list then
+	// the current token list will be udpated to match the good token list
+	goodTokens := make([]sharing.DeviceNotificationToken, 0, len(onlineUser.DeviceTokens))
 	for _, device := range onlineUser.DeviceTokens {
 		fcm.To = device.NotificationToken
 		buf := new(bytes.Buffer)
@@ -251,9 +268,39 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 			return err
 		}
 		defer resp.Body.Close()
-		if http.StatusOK != resp.StatusCode {
+		if http.StatusOK == resp.StatusCode {
+			respBody, err := ioutil.ReadAll(resp.Body)
+			if nil == err {
+				stringBody := string(respBody)
+				inputJSON := []byte(string(stringBody))
+				var fcmResponse googleCloudResponse
+				err = json.Unmarshal(inputJSON, &fcmResponse)
+				if nil != err && fcmResponse.Failure > 0 && len(fcmResponse.Results) > 0 {
+					switch fcmResponse.Results[0].Error {
+					case "error:MissingRegistration":
+					case "error:InvalidRegistration":
+					case "error:NotRegistered":
+						// In any of these cases the token that was used was not correct and should be
+						// removed from the array of good tokens
+						break
+					default:
+						goodTokens = append(goodTokens, device)
+						break
+					}
+				} else {
+					goodTokens = append(goodTokens, device)
+				}
+			} else {
+				ftCtx.RequestLogger.Error().Err(err).Str("token", device.NotificationToken).Msg("error reading response")
+			}
+		} else {
 			ftCtx.RequestLogger.Info().Int("httpStatus", resp.StatusCode).Str("token", device.NotificationToken).Msg("send failed")
+			goodTokens = append(goodTokens, device)
 		}
+	}
+	if len(goodTokens) != len(onlineUser.DeviceTokens) {
+		onlineUser.DeviceTokens = goodTokens
+		onlineUser.UpdateDeviceTokens(ftCtx)
 	}
 	return nil
 }
