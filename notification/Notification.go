@@ -282,6 +282,7 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 					case "error:NotRegistered":
 						// In any of these cases the token that was used was not correct and should be
 						// removed from the array of good tokens
+						ftCtx.RequestLogger.Debug().Str("error", fcmResponse.Results[0].Error).Str("token", device.NotificationToken).Msg("bad token")
 						break
 					default:
 						goodTokens = append(goodTokens, device)
@@ -299,6 +300,7 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 		}
 	}
 	if len(goodTokens) != len(onlineUser.DeviceTokens) {
+		ftCtx.RequestLogger.Debug().Msg("updating user tokens")
 		onlineUser.DeviceTokens = goodTokens
 		onlineUser.UpdateDeviceTokens(ftCtx)
 	}
