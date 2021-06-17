@@ -278,9 +278,9 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 				if nil == err && fcmResponse.Failure > 0 && len(fcmResponse.Results) > 0 {
 					ftCtx.RequestLogger.Debug().Int("success", fcmResponse.Success).Int("failure", fcmResponse.Failure).Str("token", device.NotificationToken).Str("error", fcmResponse.Results[0].Error).Msg("got valid response")
 					switch fcmResponse.Results[0].Error {
-					case "error:MissingRegistration":
-					case "error:InvalidRegistration":
-					case "error:NotRegistered":
+					case "MissingRegistration":
+					case "InvalidRegistration":
+					case "NotRegistered":
 						// In any of these cases the token that was used was not correct and should be
 						// removed from the array of good tokens
 						ftCtx.RequestLogger.Debug().Str("error", fcmResponse.Results[0].Error).Str("token", device.NotificationToken).Msg("bad token")
