@@ -37,6 +37,7 @@ type DeviceNotificationToken struct {
 	AppInstallID      string `json:"deviceInstallId" dynamodbav:"deviceInstallId"`
 	SNSEndpoint       string `json:"snsEndpoint" dynamodbav:"snsEndpoint"`
 	NotificationToken string `json:"notificationToken" dynamodbav:"notificationToken"`
+	AppVersion        string `json:"appVersion" dynamodbav:"appVersion"`
 }
 
 // OnlineUser is the basic profile information

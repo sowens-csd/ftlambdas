@@ -70,9 +70,7 @@ func DeleteStoriesForUser(ctx awsproxy.FTContext) error {
 	return nil
 }
 
-// FindSharedStoriesForUser returns the complete set of stories available to the
-// current user based on their group memberhips and groups the story is shared with.
-func FindSharedStoriesForUser(ctx awsproxy.FTContext) (*SharedStories, error) {
+func findUniqueStoriesForUser(ctx awsproxy.FTContext) (map[string][]*SharedStory, error) {
 	groups, err := FindGroupsForUser(ctx)
 	if err != nil {
 		return nil, err
@@ -95,11 +93,21 @@ func FindSharedStoriesForUser(ctx awsproxy.FTContext) (*SharedStories, error) {
 			ctx.RequestLogger.Info().Str("story_id", storyID).Msg("Load failed")
 		}
 	}
+	return uniqueStories, nil
+}
+
+// FindSharedStoriesForUser returns the complete set of stories available to the
+// current user based on their group memberhips and groups the story is shared with.
+func FindSharedStoriesForUser(ctx awsproxy.FTContext) (*SharedStories, error) {
+	uniqueStories, err := findUniqueStoriesForUser(ctx)
+	if nil != err {
+		return nil, err
+	}
 	var stories []SharedStory
 	for _, storyList := range uniqueStories {
 		bestStory := chooseBestStory(storyList)
 		ctx.RequestLogger.Info().Str("story", bestStory.StoryID).Msg("user has story")
-		stories = append(stories, chooseBestStory(storyList))
+		stories = append(stories, bestStory)
 	}
 	sharedStories := SharedStories{
 		PageToken: "",
@@ -174,6 +182,11 @@ func LoadSharedStory(ctx awsproxy.FTContext, storyID string) (*SharedStory, erro
 // UpdateSharedStory ensures that the story and story group records are properly updated given
 // the JSON that is provided.
 func UpdateSharedStory(ctx awsproxy.FTContext, sharedStory SharedStory) (StoryUpdateResult, error) {
+	duplicateStoryID, isDuplicate := sharedStory.IsDuplicate(ctx)
+	if isDuplicate {
+		return StoryUpdateResult{Success: false, Status: 1, DuplicateStoryID: duplicateStoryID}, nil
+	}
+
 	if nil != sharedStory.Groups {
 		for groupIndex, groupToUpdate := range sharedStory.Groups {
 			err := groupToUpdate.Save(ctx)
@@ -222,19 +235,14 @@ func (sharedStory *SharedStory) SourceAlbumReference() string {
 func (sharedStory *SharedStory) IsDuplicate(ctx awsproxy.FTContext) (string, bool) {
 	isDuplicate := false
 	duplicateStory := ""
-	existing, err := LoadSharedStory(ctx, sharedStory.StoryID)
-	if nil == err && nil != existing {
-		return duplicateStory, isDuplicate
-	}
-	sharedStories, err := FindSharedStoriesForUser(ctx)
+	uniqueStories, err := findUniqueStoriesForUser(ctx)
 	if err != nil {
-		for _, existingStory := range sharedStories.Stories {
-			if sharedStory.SourceAlbumReference() == existingStory.SourceAlbumReference() {
-				isDuplicate = true
-				duplicateStory = existingStory.StoryID
-				break
-			}
+		storyList, found := uniqueStories[sharedStory.AlbumReference]
+		if found && len(storyList) > 1 {
+			isDuplicate = true
 		}
+	} else {
+		return "", false
 	}
 	return duplicateStory, isDuplicate
 }

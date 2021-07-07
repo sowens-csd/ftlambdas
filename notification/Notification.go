@@ -137,11 +137,6 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 
 	err = SendFCM(ftCtx, notification.Data, notification.PushNotification, destinationUser, &http.Client{Timeout: 30 * time.Second})
 
-	// structuredContent, _ := json.Marshal(&notification)
-	// gcm := googleCloudMessage{GCM: string(structuredContent)}
-	// msgContent, _ := json.Marshal(&gcm)
-	// strContent := string(msgContent)
-	// Send(ftCtx, strContent, destinationUser)
 	return err
 }
 
@@ -171,6 +166,14 @@ func SendAlert(ftCtx awsproxy.FTContext, title, alert string, destinationUser *s
 			Title: title,
 			Body:  alert,
 		},
+	}
+	if isOldUser(destinationUser) {
+		structuredContent, _ := json.Marshal(&notification)
+		gcm := googleCloudMessage{GCM: string(structuredContent)}
+		msgContent, _ := json.Marshal(&gcm)
+		strContent := string(msgContent)
+		Send(ftCtx, strContent, destinationUser)
+		return nil
 	}
 	return SendFCM(ftCtx, nil, notification.PushNotification, destinationUser, client)
 }
@@ -207,6 +210,15 @@ func SendFromSMS(ftCtx awsproxy.FTContext, smsData string, client *http.Client) 
 	if nil != err {
 		return err
 	}
+
+	if isOldUser(destinationUser) {
+		msgContent, err := buildMessageContent(*smsDetails)
+		if nil != err {
+			return err
+		}
+		Send(ftCtx, msgContent, destinationUser)
+		return nil
+	}
 	return SendFCM(ftCtx, smsDetails, nil, destinationUser, client)
 }
 
@@ -229,6 +241,18 @@ func Send(ftCtx awsproxy.FTContext, message string, onlineUser *sharing.OnlineUs
 }
 
 func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushNotification, onlineUser *sharing.OnlineUser, client *http.Client) error {
+	if isOldUser(onlineUser) {
+		var notification = commandNotification{
+			Data:             data.(commandDetails),
+			PushNotification: pushNotification,
+		}
+		structuredContent, _ := json.Marshal(&notification)
+		gcm := googleCloudMessage{GCM: string(structuredContent)}
+		msgContent, _ := json.Marshal(&gcm)
+		strContent := string(msgContent)
+		Send(ftCtx, strContent, onlineUser)
+		return nil
+	}
 	fcm := fcmCommandNotification{}
 	if nil != data {
 		fcm.Data = &data
@@ -309,6 +333,22 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 		onlineUser.UpdateDeviceTokens(ftCtx)
 	}
 	return nil
+}
+
+func isOldUser(onlineUser *sharing.OnlineUser) bool {
+	isOld := false
+	for _, device := range onlineUser.DeviceTokens {
+		isOld = isOld || device.AppVersion == ""
+	}
+	return isOld
+}
+
+func buildMessageContent(sms smsDetails) (string, error) {
+	smsNotify := smsNotification{Data: sms}
+	structuredContent, _ := json.Marshal(&smsNotify)
+	gcm := googleCloudMessage{GCM: string(structuredContent)}
+	msgContent, _ := json.Marshal(&gcm)
+	return string(msgContent), nil
 }
 
 func buildSmsDetails(ftCtx awsproxy.FTContext, smsData string) (*smsDetails, error) {

@@ -86,11 +86,34 @@ const (
 		],
 		"sharedStory": {
 			"id": "story1",
-			"albumReference": "album1",
+			"albumReference": "albumReference1",
 			"content": "Content 1",
 			"version":"8d3e4d3a-61cd-4877-bd6c-c9d4928565fd",
 			"lastUpdated":428409384,
 			"lastUpdatedBy":"user1",
+			"storySource":"gphoto"
+		}
+	}
+	`
+	duplicateShareStoryJSON1 = `
+	{
+		"groups": [
+			{
+				"storyId": "duplicate1",
+				"groupId": "group1",
+				"version": "dbf0c989-48a6-4161-a407-c2ecc9e6011d",
+				"lastUpdated": 1624909391707,
+				"lastUpdatedBy": "user2",
+				"status": "y"
+			}
+		],
+		"sharedStory": {
+			"id": "story1",
+			"albumReference": "albumReference1",
+			"content": "Content 2",
+			"version":"fa730fcb-815b-44c3-a012-a2f2e6bd2b2b",
+			"lastUpdated":1624909391707,
+			"lastUpdatedBy":"user2",
 			"storySource":"gphoto"
 		}
 	}

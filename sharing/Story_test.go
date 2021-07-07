@@ -29,6 +29,22 @@ func TestStoryAndGroupRecordsUpdated(t *testing.T) {
 	}
 }
 
+func TestDuplicateStoryConvertedOnUpdate(t *testing.T) {
+	testDB := awsproxy.NewTestDBSvcWithData(storyTestDBData)
+	ftCtx := awsproxy.NewTestContext(userID2, testDB)
+	inputJSON := []byte(duplicateShareStoryJSON1)
+	var sharedStory SharedStory
+	err := json.Unmarshal(inputJSON, &sharedStory)
+	if nil != err {
+		t.Errorf("Failed %s", err.Error())
+	}
+	_, err = UpdateSharedStory(ftCtx, sharedStory)
+	if nil != err {
+		t.Errorf("Failed %s", err.Error())
+	}
+	testDB.ExpectPutCount(0, t)
+}
+
 func TestLoadPopulatesStory(t *testing.T) {
 	testDB := awsproxy.NewTestDBSvcWithData(storyTestDBData)
 	ftCtx := awsproxy.NewTestContext(userID2, testDB)
