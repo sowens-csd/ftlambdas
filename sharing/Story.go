@@ -239,9 +239,16 @@ func (sharedStory *SharedStory) IsDuplicate(ctx awsproxy.FTContext) (string, boo
 	if err != nil {
 		storyList, found := uniqueStories[sharedStory.AlbumReference]
 		if found && len(storyList) > 1 {
+			fmt.Println("More than one unique story found")
 			isDuplicate = true
+		} else {
+			fmt.Println("one unique story found")
+			for _, existingStory := range storyList {
+				isDuplicate = isDuplicate || sharedStory.SourceAlbumReference() == existingStory.SourceAlbumReference()
+			}
 		}
 	} else {
+		fmt.Println("No stories found")
 		return "", false
 	}
 	return duplicateStory, isDuplicate

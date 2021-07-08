@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-lambda-go v1.24.0
 	github.com/aws/aws-sdk-go-v2 v1.7.0
 	github.com/aws/aws-sdk-go-v2/config v1.4.1
+	github.com/aws/aws-sdk-go-v2/credentials v1.3.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue v1.1.2
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.4.0
 	github.com/aws/aws-sdk-go-v2/service/firehose v1.2.2 // indirect

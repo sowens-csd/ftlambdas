@@ -108,7 +108,7 @@ const (
 			}
 		],
 		"sharedStory": {
-			"id": "story1",
+			"id": "duplicate1",
 			"albumReference": "albumReference1",
 			"content": "Content 2",
 			"version":"fa730fcb-815b-44c3-a012-a2f2e6bd2b2b",
