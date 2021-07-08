@@ -238,7 +238,7 @@ func (sharedStory *SharedStory) IsDuplicate(ctx awsproxy.FTContext) (string, boo
 	isDuplicate := false
 	duplicateStory := ""
 	uniqueStories, err := findUniqueStoriesForUser(ctx)
-	if err != nil {
+	if err == nil {
 		storyList, found := uniqueStories[sharedStory.SourceAlbumReference()]
 		if found && len(storyList) > 1 {
 			ctx.RequestLogger.Debug().Msg("multiple unique stories in list")
