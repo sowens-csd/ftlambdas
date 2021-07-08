@@ -81,6 +81,7 @@ func findUniqueStoriesForUser(ctx awsproxy.FTContext) (map[string][]*SharedStory
 	}
 	uniqueStories := make(map[string][]*SharedStory)
 	for _, storyID := range storyIDs {
+		ctx.RequestLogger.Debug().Str("story_id", storyID).Msg("unique, loading story")
 		story, err := LoadSharedStory(ctx, storyID)
 		if nil == err {
 			stories, exists := uniqueStories[story.SourceAlbumReference()]
@@ -88,6 +89,7 @@ func findUniqueStoriesForUser(ctx awsproxy.FTContext) (map[string][]*SharedStory
 				stories = make([]*SharedStory, 0)
 				uniqueStories[story.SourceAlbumReference()] = stories
 			}
+			ctx.RequestLogger.Debug().Str("story_id", storyID).Str("ref", story.SourceAlbumReference()).Msg("adding unique story")
 			uniqueStories[story.SourceAlbumReference()] = append(stories, story)
 		} else {
 			ctx.RequestLogger.Info().Str("story_id", storyID).Msg("Load failed")
@@ -239,16 +241,19 @@ func (sharedStory *SharedStory) IsDuplicate(ctx awsproxy.FTContext) (string, boo
 	if err != nil {
 		storyList, found := uniqueStories[sharedStory.SourceAlbumReference()]
 		if found && len(storyList) > 1 {
-			fmt.Println("More than one unique story found")
+			ctx.RequestLogger.Debug().Msg("multiple unique stories in list")
 			isDuplicate = true
-		} else {
-			fmt.Println("one unique story found")
+		} else if found {
+			ctx.RequestLogger.Debug().Int("stories", len(storyList)).Msg("unique story list")
 			for _, existingStory := range storyList {
+				ctx.RequestLogger.Debug().Str("ref", sharedStory.SourceAlbumReference()).Str("existing ref", existingStory.SourceAlbumReference()).Msg("checking existing story")
 				isDuplicate = isDuplicate || sharedStory.SourceAlbumReference() == existingStory.SourceAlbumReference()
 			}
+		} else {
+
 		}
 	} else {
-		fmt.Println("No stories found")
+		ctx.RequestLogger.Info().Err(err).Msg("error finding unique")
 		return "", false
 	}
 	return duplicateStory, isDuplicate
