@@ -247,7 +247,7 @@ func (sharedStory *SharedStory) IsDuplicate(ctx awsproxy.FTContext) (string, boo
 			ctx.RequestLogger.Debug().Int("stories", len(storyList)).Msg("unique story list")
 			for _, existingStory := range storyList {
 				ctx.RequestLogger.Debug().Str("ref", sharedStory.SourceAlbumReference()).Str("existing ref", existingStory.SourceAlbumReference()).Msg("checking existing story")
-				isDuplicate = isDuplicate || sharedStory.SourceAlbumReference() == existingStory.SourceAlbumReference()
+				isDuplicate = isDuplicate || sharedStory.StoryID != existingStory.StoryID
 			}
 		} else {
 
