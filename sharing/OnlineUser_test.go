@@ -171,19 +171,19 @@ func TestCanGenerateANewUserID(t *testing.T) {
 
 func TestSetNotificationTokenNoTokensAddsIt(t *testing.T) {
 	newUser := OnlineUser{ID: userID1}
-	newUser.SetDeviceNotificationToken(appInstallID1, snsEndpoint1, notificationToken1)
+	newUser.SetDeviceNotificationToken(appInstallID1, snsEndpoint1, notificationToken1, appVersion1)
 	expectFindDeviceNotificationToken(&newUser, appInstallID1, snsEndpoint1, notificationToken1, t)
 }
 
 func TestSetNotificationTokenUpdatesExisting(t *testing.T) {
 	newUser := testUser1WithNotificationTokens()
-	newUser.SetDeviceNotificationToken(appInstallID1, updatedSNSEndpoint1, updatedNotificationToken1)
+	newUser.SetDeviceNotificationToken(appInstallID1, updatedSNSEndpoint1, updatedNotificationToken1, appVersion1)
 	expectFindDeviceNotificationToken(&newUser, appInstallID1, updatedSNSEndpoint1, updatedNotificationToken1, t)
 }
 
 func TestSetNotificationTokenAddsNewWithExisting(t *testing.T) {
 	newUser := testUser1WithNotificationTokens()
-	newUser.SetDeviceNotificationToken(appInstallID3, updatedSNSEndpoint1, updatedNotificationToken1)
+	newUser.SetDeviceNotificationToken(appInstallID3, updatedSNSEndpoint1, updatedNotificationToken1, appVersion1)
 	expectFindDeviceNotificationToken(&newUser, appInstallID3, updatedSNSEndpoint1, updatedNotificationToken1, t)
 }
 

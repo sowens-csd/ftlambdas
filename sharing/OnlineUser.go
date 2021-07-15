@@ -213,11 +213,12 @@ func (ou *OnlineUser) FindDeviceNotificationToken(appInstallID string) *DeviceNo
 
 // SetDeviceNotificationToken either adds a new entry with the endpoint and token or updates an existing entry if
 // the appInstallID already has an endpoint for the user.
-func (ou *OnlineUser) SetDeviceNotificationToken(appInstallID string, endpoint string, notificationToken string) {
+func (ou *OnlineUser) SetDeviceNotificationToken(appInstallID, endpoint, notificationToken, appVersion string) {
 	index := ou.findNotificationTokenIndex(appInstallID)
 	if index >= 0 {
 		ou.DeviceTokens[index].SNSEndpoint = endpoint
 		ou.DeviceTokens[index].NotificationToken = notificationToken
+		ou.DeviceTokens[index].AppVersion = appVersion
 		return
 	}
 	if nil == ou.DeviceTokens {
@@ -226,7 +227,8 @@ func (ou *OnlineUser) SetDeviceNotificationToken(appInstallID string, endpoint s
 	ou.DeviceTokens = append(ou.DeviceTokens, DeviceNotificationToken{
 		AppInstallID:      appInstallID,
 		NotificationToken: notificationToken,
-		SNSEndpoint:       endpoint})
+		SNSEndpoint:       endpoint,
+		AppVersion:        appVersion})
 }
 
 func (ou *OnlineUser) findNotificationTokenIndex(appInstallID string) int {

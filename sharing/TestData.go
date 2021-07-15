@@ -32,6 +32,7 @@ const (
 	notificationToken1           = "token1"
 	notificationToken2           = "token2"
 	updatedNotificationToken1    = "updatedToken1"
+	appVersion1                  = "5.4.4+2150"
 
 	// Story Information
 	storyID1          = "story1"

@@ -15,6 +15,7 @@ import (
 type deviceNotificationTokenReq struct {
 	AppInstallID string `json:"appInstallId" dynamodbav:"appInstallId"`
 	DeviceToken  string `json:"deviceToken" dynamodbav:"deviceToken"`
+	AppVersion   string `json:"appVersion" dynamodbav:"appVersion"`
 }
 
 // RegisterFromRequest registers a new endpoint from a JSON version of an DeviceNotificationTokenReq
@@ -30,12 +31,12 @@ func RegisterFromRequest(ftCtx awsproxy.FTContext, tokenReq string) error {
 		ftCtx.RequestLogger.Info().Str("req", tokenReq).Msg("Invalid request")
 		return fmt.Errorf("Invalid request")
 	}
-	return Register(ftCtx, regReq.AppInstallID, regReq.DeviceToken)
+	return Register(ftCtx, regReq.AppInstallID, regReq.DeviceToken, regReq.AppVersion)
 }
 
 // Register creates or updates an endpoint ARN for the given device token and then stores it
 // in the OnlineUser for future use.
-func Register(ftCtx awsproxy.FTContext, appInstallID string, deviceToken string) error {
+func Register(ftCtx awsproxy.FTContext, appInstallID, deviceToken, appVersion string) error {
 	ftCtx.RequestLogger.Debug().Str("appID", appInstallID).Str("noteToken", deviceToken).Msg("Registering token")
 	user, err := sharing.LoadOnlineUser(ftCtx, ftCtx.UserID)
 	if nil != err {
@@ -51,7 +52,7 @@ func Register(ftCtx awsproxy.FTContext, appInstallID string, deviceToken string)
 
 	if createNeeded {
 		// No platform endpoint ARN is stored; need to call createEndpoint.
-		endpointArn, _ = createEndpoint(ftCtx, appInstallID, deviceToken, user)
+		endpointArn, _ = createEndpoint(ftCtx, appInstallID, deviceToken, appVersion, user)
 		createNeeded = false
 	}
 
@@ -75,7 +76,7 @@ func Register(ftCtx awsproxy.FTContext, appInstallID string, deviceToken string)
 	}
 
 	if createNeeded {
-		endpointArn, err = createEndpoint(ftCtx, appInstallID, deviceToken, user)
+		endpointArn, err = createEndpoint(ftCtx, appInstallID, deviceToken, appVersion, user)
 	}
 
 	if updateNeeded {
@@ -99,7 +100,7 @@ func Register(ftCtx awsproxy.FTContext, appInstallID string, deviceToken string)
 	return nil
 }
 
-func createEndpoint(ftCtx awsproxy.FTContext, appInstallID string, deviceToken string, user *sharing.OnlineUser) (string, error) {
+func createEndpoint(ftCtx awsproxy.FTContext, appInstallID, deviceToken, appVersion string, user *sharing.OnlineUser) (string, error) {
 	endpointArn := ""
 	appArn := os.Getenv("snsAppArn")
 	ftCtx.RequestLogger.Debug().Str("appID", appInstallID).Str("noteToken", deviceToken).Str("appArn", appArn).Msg("Creating endpoint")
@@ -119,7 +120,7 @@ func createEndpoint(ftCtx awsproxy.FTContext, appInstallID string, deviceToken s
 			return "", err
 		}
 	}
-	storeEndpointArn(ftCtx, endpointArn, appInstallID, deviceToken, user)
+	storeEndpointArn(ftCtx, endpointArn, appInstallID, deviceToken, appVersion, user)
 	return endpointArn, nil
 }
 
@@ -138,9 +139,9 @@ func findArnInMessage(message string) string {
 	return endpointArn
 }
 
-func storeEndpointArn(ftCtx awsproxy.FTContext, endpointArn string, appInstallID string, notificationToken string, user *sharing.OnlineUser) {
+func storeEndpointArn(ftCtx awsproxy.FTContext, endpointArn, appInstallID, notificationToken, appVersion string, user *sharing.OnlineUser) {
 	ftCtx.RequestLogger.Debug().Str("appID", appInstallID).Str("endpointArn", endpointArn).Str("noteToken", notificationToken).Msg("Saving endpoint")
-	user.SetDeviceNotificationToken(appInstallID, endpointArn, notificationToken)
+	user.SetDeviceNotificationToken(appInstallID, endpointArn, notificationToken, appVersion)
 	err := user.UpdateAll(ftCtx)
 	if nil != err {
 		ftCtx.RequestLogger.Info().Str("endpoint", endpointArn).Str("appID", appInstallID).Str("noteToken", notificationToken).Msg("Error saving user " + err.Error())
