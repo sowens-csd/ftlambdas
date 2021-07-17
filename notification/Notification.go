@@ -443,7 +443,7 @@ func buildSmsDetails(ftCtx awsproxy.FTContext, smsData string) (*smsDetails, err
 
 func plivoMediaLookup(ftCtx awsproxy.FTContext, mediaURL string) (string, string, error) {
 	ftCtx.RequestLogger.Debug().Str("mediaURL", mediaURL).Msg("Looking up media 1")
-	plivoAccount, plivoSID, plivoSecret := awsproxy.PlivoParameters()
+	plivoAccount, plivoSID, plivoSecret := awsproxy.PlivoParameters(ftCtx.Context)
 	if len(plivoAccount) == 0 || len(plivoSID) == 0 || len(plivoSecret) == 0 {
 		return "", "", fmt.Errorf("Account: %s, SID: %s, or Secret: %s not configured in Parameter Store or SetupAccessParameters not called", plivoAccount, plivoSID, plivoSecret)
 	}

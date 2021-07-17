@@ -105,7 +105,7 @@ func getAvailableTwilioNumbers(ftCtx awsproxy.FTContext, isoCountry string, area
 /// Search Plivo for available phone numbers given the country and prefix provided.
 func getAvailablePlivoNumbers(ftCtx awsproxy.FTContext, isoCountry string, areacode string) (AvailableNumbers, error) {
 	emptyResponse := AvailableNumbers{}
-	plivoClient, err := getPlivoClient()
+	plivoClient, err := getPlivoClient(ftCtx)
 	if err != nil {
 		return emptyResponse, err
 	}
@@ -200,12 +200,12 @@ func provisionWithTwilio(ftCtx awsproxy.FTContext, phoneNumber string, mockReque
 
 /// Given a phone number to buy either successfully buy it or return an explanatory error
 func provisionWithPlivo(ftCtx awsproxy.FTContext, phoneNumber string, mockRequest bool) (string, string, error) {
-	plivoClient, err := getPlivoClient()
+	plivoClient, err := getPlivoClient(ftCtx)
 	if err != nil {
 		return "", "", err
 	}
 	provisionNumber := toPlivoNumber(phoneNumber)
-	appSID := awsproxy.PlivoAppSID()
+	appSID := awsproxy.PlivoAppSID(ftCtx.Context)
 	if len(appSID) == 0 {
 		ftCtx.RequestLogger.Info().Msg("Plivo AppSID not set")
 		return "", "", fmt.Errorf("Plivo AppSID not set")
@@ -239,7 +239,7 @@ func provisionWithPlivo(ftCtx awsproxy.FTContext, phoneNumber string, mockReques
 
 // DeleteNumber deprovisions the given number from Plivo / Twilio
 func DeleteNumber(ftCtx awsproxy.FTContext, number string) error {
-	plivoClient, err := getPlivoClient()
+	plivoClient, err := getPlivoClient(ftCtx)
 	if nil != err {
 		return err
 	}
@@ -247,8 +247,8 @@ func DeleteNumber(ftCtx awsproxy.FTContext, number string) error {
 	return err
 }
 
-func getPlivoClient() (*plivo.Client, error) {
-	plivoAccount, plivoSID, plivoSecret := awsproxy.PlivoParameters()
+func getPlivoClient(ftCtx awsproxy.FTContext) (*plivo.Client, error) {
+	plivoAccount, plivoSID, plivoSecret := awsproxy.PlivoParameters(ftCtx.Context)
 	if len(plivoAccount) == 0 || len(plivoSID) == 0 || len(plivoSecret) == 0 {
 		return nil, fmt.Errorf("Account, SID, or Secret not configured in Parameter Store or SetupAccessParameters not called")
 	}

@@ -68,13 +68,25 @@ func TwilioParameters() (string, string, string, string) {
 
 // PlivoParameters returns the current values of the Plivo parameters, always call
 // SetupAccessParameters first or they will be empty
-func PlivoParameters() (string, string, string) {
+func PlivoParameters(ctx context.Context) (string, string, string) {
+	if len(plivoAccount) == 0 {
+		SetupParameterStore(ctx)
+
+		plivoAccount = getParameter(ctx, plivoAccountPath)
+		plivoSID = getParameter(ctx, plivoSIDPath)
+		plivoSecret = getParameter(ctx, plivoSecretPath)
+	}
 	return plivoAccount, plivoSID, plivoSecret
 }
 
 // PlivoAppSID returns the current values of the application SID, always call
 // SetupAccessParameters first or it will be empty
-func PlivoAppSID() string {
+func PlivoAppSID(ctx context.Context) string {
+	if len(plivoAppSID) == 0 {
+		SetupParameterStore(ctx)
+		plivoAppSID = getParameter(ctx, plivoAppSIDPath)
+	}
+
 	return plivoAppSID
 }
 
@@ -146,11 +158,6 @@ func SetupAccessParameters(ctx context.Context) {
 	twilioSID = getParameter(ctx, twilioSIDPath)
 	twilioAppSID = getParameter(ctx, twilioAppSIDPath)
 	twilioSecret = getParameter(ctx, twilioSecretPath)
-
-	plivoAccount = getParameter(ctx, plivoAccountPath)
-	plivoSID = getParameter(ctx, plivoSIDPath)
-	plivoAppSID = getParameter(ctx, plivoAppSIDPath)
-	plivoSecret = getParameter(ctx, plivoSecretPath)
 
 	webrtcAccessToken = getParameter(ctx, webrtcAccessTokenPath)
 	webrtcSecret = getParameter(ctx, webrtcSecretPath)
