@@ -40,6 +40,7 @@ const (
 	storyResourceID1  = "S#" + storyID1
 	storyReferenceID1 = "S#" + storyID1
 	content1          = "Content 1"
+	gphotoSource      = "gphoto"
 
 	// Group Information
 	invitationID1    = "invitation1"
@@ -108,7 +109,6 @@ const (
 				"status": "y"
 			}
 		],
-		"sharedStory": {
 			"id": "duplicate1",
 			"albumReference": "albumReference1",
 			"content": "Content 2",
@@ -116,7 +116,6 @@ const (
 			"lastUpdated":1624909391707,
 			"lastUpdatedBy":"user2",
 			"storySource":"gphoto"
-		}
 	}
 	`
 )
@@ -221,6 +220,7 @@ func testStory1Record() awsproxy.TestDBDataRecord {
 			ftdb.ReferenceIDField:    storyReferenceID1,
 			ftdb.IDField:             storyID1,
 			ftdb.AlbumReferenceField: albumReference1,
+			ftdb.StorySourceField:    gphotoSource,
 			ftdb.ContentField:        content1,
 			ftdb.VersionField:        version1,
 			ftdb.BaseVersionField:    version1,

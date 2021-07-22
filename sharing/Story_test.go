@@ -31,7 +31,7 @@ func TestStoryAndGroupRecordsUpdated(t *testing.T) {
 
 func TestDuplicateStoryBlockedOnUpdate(t *testing.T) {
 	testDB := awsproxy.NewTestDBSvcWithData(storyTestDBData)
-	ftCtx := awsproxy.NewTestContext(userID2, testDB)
+	ftCtx := awsproxy.NewTestContext(userID1, testDB)
 	inputJSON := []byte(duplicateShareStoryJSON1)
 	var sharedStory SharedStory
 	err := json.Unmarshal(inputJSON, &sharedStory)
