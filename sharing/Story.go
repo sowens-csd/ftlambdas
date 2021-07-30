@@ -36,7 +36,7 @@ type StoryGroup struct {
 type SharedStory struct {
 	StoryID        string       `json:"id" dynamodbav:"id"`
 	AlbumReference string       `json:"albumReference" dynamodbav:"albumReference"`
-	Title          string       `json:"title" dynamodbav:"title"`
+	Title          string       `json:"title,omitempty" dynamodbav:"title,omitempty"`
 	Content        string       `json:"content,omitempty" dynamodbav:"content"`
 	Version        string       `json:"version" dynamodbav:"version"`
 	BaseVersion    string       `json:"baseVersion" dynamodbav:"baseVersion"`
