@@ -179,7 +179,7 @@ func SendAlert(ftCtx awsproxy.FTContext, title, alert string, destinationUser *s
 }
 
 // SendStoryChangeCommand creates a new push notification that represents a remote command
-func SendStoryChangeCommand(ftCtx awsproxy.FTContext, storyID string, destinationUser *sharing.OnlineUser, client *http.Client) error {
+func SendStoryChangeCommand(ftCtx awsproxy.FTContext, storyID, title, lastUpdatedBy string, destinationUser *sharing.OnlineUser, client *http.Client) error {
 	var notification = commandNotification{
 		Data: commandDetails{
 			NotificationType: "remoteCommand",
@@ -190,7 +190,7 @@ func SendStoryChangeCommand(ftCtx awsproxy.FTContext, storyID string, destinatio
 		},
 		PushNotification: &pushNotification{
 			Title: "Story Update",
-			Body:  "There's new story content in Folktells.",
+			Body:  fmt.Sprintf("Story '%s' was updated by %s.", title, lastUpdatedBy),
 		},
 	}
 

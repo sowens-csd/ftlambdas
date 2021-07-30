@@ -60,7 +60,7 @@ func notifyAffectedUsers(ftCtx awsproxy.FTContext, sharedStory sharing.SharedSto
 				ftCtx.RequestLogger.Debug().Str("userID", user.ID).Msg("Checking user")
 				if user.ID != ftCtx.UserID {
 					ftCtx.RequestLogger.Debug().Str("userID", user.ID).Msg("Notifying user")
-					notification.SendStoryChangeCommand(ftCtx, sharedStory.StoryID, user, client)
+					notification.SendStoryChangeCommand(ftCtx, sharedStory.StoryID, sharedStory.Title, sharedStory.LastUpdatedBy, user, client)
 					ftCtx.RequestLogger.Debug().Str("userID", user.ID).Msg("Notified user")
 				}
 			}
