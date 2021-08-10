@@ -93,7 +93,7 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID string) ([]WebRTCIceServer, error) {
 	kvsSession := session.Must(session.NewSession())
 	service := kvsc.New(kvsSession)
-	st := kvsc.ServiceTurn
+	// st := kvsc.ServiceTurn
 	ftCtx.RequestLogger.Debug().Msg("got ice server service")
 	isci := kvsc.GetIceServerConfigInput{
 		ChannelARN: &channelARN,
