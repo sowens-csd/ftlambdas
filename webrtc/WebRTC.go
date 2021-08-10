@@ -170,7 +170,9 @@ func getVideoService(ftCtx awsproxy.FTContext) *kvs.Client {
 
 func getVideoSignaling(ftCtx awsproxy.FTContext, channelEndpoint string) *kvsc.Client {
 	channelResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		ftCtx.RequestLogger.Debug().Str("service", service).Msg("resolver called")
 		if service == kvsc.ServiceID {
+			ftCtx.RequestLogger.Debug().Str("channelEndpoint", channelEndpoint).Msg("using channelEndpoint")
 			return aws.Endpoint{
 				PartitionID:   "aws",
 				URL:           channelEndpoint,
