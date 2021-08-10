@@ -98,7 +98,8 @@ func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID string) ([]We
 	isci := kvsc.GetIceServerConfigInput{
 		ChannelARN: &channelARN,
 		// ClientId:   &deviceID,
-		Service: &st}
+		// Service: &st,
+	}
 	iceConfig, err := service.GetIceServerConfig(&isci)
 	if err != nil {
 		ftCtx.RequestLogger.Error().Err(err).Msg("cfg returned error")
