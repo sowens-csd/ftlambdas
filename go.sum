@@ -146,6 +146,8 @@ github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.2.2 h1:Xv1rGYgsRR
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.2.2/go.mod h1:NXmNI41bdEsJMrD0v9rUvbGCB5GwdBEpKvUvIY3vTFg=
 github.com/aws/aws-sdk-go-v2/service/kinesisvideo v1.1.5 h1:viwyFdr25QhLZiGvHPqe+WumNlxxdcpg2XBmR/pSnyA=
 github.com/aws/aws-sdk-go-v2/service/kinesisvideo v1.1.5/go.mod h1:0Gbr763PMwc5S5zrf14HliE0PnxWHR5Qj79q3jk6biU=
+github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling v1.3.2 h1:K+3RUjiWHytoPwIwt8pWNim/cpdzm65iMgz6Bf7dGwY=
+github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling v1.3.2/go.mod h1:IQantvg++SojpMxqY8QHzyLhJ73wmnsSOESk/cfWKQk=
 github.com/aws/aws-sdk-go-v2/service/ses v1.2.2 h1:NVHy0deH7YK3yJc+xB1gA/wZeNXWVtL4zOTSdj5spfI=
 github.com/aws/aws-sdk-go-v2/service/ses v1.2.2/go.mod h1:fdj/PsFS59GndzkUKAuWw7cLOjgLHn+V8V6otywinUk=
 github.com/aws/aws-sdk-go-v2/service/ses v1.2.3 h1:TLNw9hJCQXWf9edJBzDBUtBP/KJb1mGOHfOECuaTitc=

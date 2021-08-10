@@ -13,6 +13,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.4.2
 	github.com/aws/aws-sdk-go-v2/service/firehose v1.2.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/kinesisvideo v1.1.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling v1.3.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ses v1.5.1
 	github.com/aws/aws-sdk-go-v2/service/sns v1.7.1
 	github.com/aws/aws-sdk-go-v2/service/ssm v1.8.1

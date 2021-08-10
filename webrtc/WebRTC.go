@@ -14,16 +14,15 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	kvs "github.com/aws/aws-sdk-go-v2/service/kinesisvideo"
 	"github.com/aws/aws-sdk-go-v2/service/kinesisvideo/types"
-	"github.com/aws/aws-sdk-go/aws/session"
-	kvsc "github.com/aws/aws-sdk-go/service/kinesisvideosignalingchannels"
+	kvsc "github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling"
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 )
 
 type WebRTCIceServer struct {
-	Password string    `json:"password"`
-	Username string    `json:"username"`
-	Ttl      int64     `json:"ttl"`
-	Uris     []*string `json:"uris"`
+	Password string   `json:"password"`
+	Username string   `json:"username"`
+	Ttl      int32    `json:"ttl"`
+	Uris     []string `json:"uris"`
 }
 
 type WebRTCService struct {
@@ -91,16 +90,15 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 }
 
 func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID string) ([]WebRTCIceServer, error) {
-	kvsSession := session.Must(session.NewSession())
-	service := kvsc.New(kvsSession)
 	// st := kvsc.ServiceTurn
+	service := getVideoSignaling(ftCtx)
 	ftCtx.RequestLogger.Debug().Msg("got ice server service")
 	isci := kvsc.GetIceServerConfigInput{
 		ChannelARN: &channelARN,
 		// ClientId:   &deviceID,
 		// Service: &st,
 	}
-	iceConfig, err := service.GetIceServerConfig(&isci)
+	iceConfig, err := service.GetIceServerConfig(ftCtx.Context, &isci)
 	if err != nil {
 		ftCtx.RequestLogger.Error().Err(err).Msg("cfg returned error")
 		return make([]WebRTCIceServer, 0), nil
@@ -111,7 +109,7 @@ func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID string) ([]We
 		iceServer := WebRTCIceServer{
 			Password: *server.Password,
 			Username: *server.Username,
-			Ttl:      *server.Ttl,
+			Ttl:      server.Ttl,
 			Uris:     server.Uris,
 		}
 		ftCtx.RequestLogger.Debug().Str("username", *server.Username).Int("uris", len(server.Uris)).Msg("found a server")
@@ -165,4 +163,12 @@ func getVideoService(ftCtx awsproxy.FTContext) *kvs.Client {
 		// handle error
 	}
 	return kvs.NewFromConfig(cfg)
+}
+
+func getVideoSignaling(ftCtx awsproxy.FTContext) *kvsc.Client {
+	cfg, err := config.LoadDefaultConfig(ftCtx.Context)
+	if err != nil {
+		// handle error
+	}
+	return kvsc.NewFromConfig(cfg)
 }
