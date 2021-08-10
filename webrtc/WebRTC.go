@@ -14,11 +14,21 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	kvs "github.com/aws/aws-sdk-go-v2/service/kinesisvideo"
 	"github.com/aws/aws-sdk-go-v2/service/kinesisvideo/types"
+	"github.com/aws/aws-sdk-go/aws/session"
+	kvsc "github.com/aws/aws-sdk-go/service/kinesisvideosignalingchannels"
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 )
 
+type WebRTCIceServer struct {
+	Password string    `json:"password"`
+	Username string    `json:"username"`
+	Ttl      int64     `json:"ttl"`
+	Uris     []*string `json:"uris"`
+}
+
 type WebRTCService struct {
-	SignedURI string
+	SignedURI  string
+	IceServers []WebRTCIceServer
 }
 
 func CreateChannel(ftCtx awsproxy.FTContext, deviceId string) (string, error) {
@@ -62,7 +72,10 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 		return services, err
 	}
 
-	// iceServers := findIceServers(channelARN);
+	iceServers, err := findIceServers(channelARN, deviceId)
+	if nil != err {
+		return services, err
+	}
 	channelProtocol = types.ChannelProtocolWss
 	smcCfg = types.SingleMasterChannelEndpointConfiguration{Protocols: []types.ChannelProtocol{channelProtocol}, Role: channelRole}
 	endpointInput = kvs.GetSignalingChannelEndpointInput{ChannelARN: &channelARN, SingleMasterChannelEndpointConfiguration: &smcCfg}
@@ -74,20 +87,32 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 		return services, fmt.Errorf("No endpoints found.")
 	}
 	signedURI, err := buildSignedRequest(ftCtx, channelARN, deviceId, *channelEndpoint.ResourceEndpointList[0].ResourceEndpoint, viewer)
-	return WebRTCService{SignedURI: signedURI}, err
+	return WebRTCService{SignedURI: signedURI, IceServers: iceServers}, err
 }
 
-func findIceServers(channelARN, deviceID string) {
-	// kvsSession := session.Must(session.NewSession())
-	// service := kvsc.New(kvsSession)
-	// var iceConfig = await _service.getIceServerConfig(
-	//     channelARN: &channelARN,
-	//     clientId: &devdeviceID,
-	//     service: kvsc.ServiceTurn,
-	// List<Map<String, String>> servers = [
-	//   {'urls': 'stun:stun.kinesisvideo.ca-central-1.amazonaws.com:443'}
-	// ];
-	// return iceServers;
+func findIceServers(channelARN, deviceID string) ([]WebRTCIceServer, error) {
+	kvsSession := session.Must(session.NewSession())
+	service := kvsc.New(kvsSession)
+	st := kvsc.ServiceTurn
+	isci := kvsc.GetIceServerConfigInput{
+		ChannelARN: &channelARN,
+		ClientId:   &deviceID,
+		Service:    &st}
+	iceConfig, err := service.GetIceServerConfig(&isci)
+	if err != nil {
+		return make([]WebRTCIceServer, 0), nil
+	}
+	iceServerList := make([]WebRTCIceServer, len(iceConfig.IceServerList))
+	for _, server := range iceConfig.IceServerList {
+		iceServer := WebRTCIceServer{
+			Password: *server.Password,
+			Username: *server.Username,
+			Ttl:      *server.Ttl,
+			Uris:     server.Uris,
+		}
+		iceServerList = append(iceServerList, iceServer)
+	}
+	return iceServerList, nil
 }
 
 func buildSignedRequest(ftCtx awsproxy.FTContext, channelARN, deviceID, socketURL string, viewer bool) (string, error) {
