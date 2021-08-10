@@ -72,7 +72,7 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 		return services, err
 	}
 
-	iceServers, err := findIceServers(channelARN, deviceId)
+	iceServers, err := findIceServers(ftCtx, channelARN, deviceId)
 	if nil != err {
 		return services, err
 	}
@@ -90,19 +90,22 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 	return WebRTCService{SignedURI: signedURI, IceServers: iceServers}, err
 }
 
-func findIceServers(channelARN, deviceID string) ([]WebRTCIceServer, error) {
+func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID string) ([]WebRTCIceServer, error) {
 	kvsSession := session.Must(session.NewSession())
 	service := kvsc.New(kvsSession)
 	st := kvsc.ServiceTurn
+	ftCtx.RequestLogger.Debug().Msg("got ice server service")
 	isci := kvsc.GetIceServerConfigInput{
 		ChannelARN: &channelARN,
 		ClientId:   &deviceID,
 		Service:    &st}
 	iceConfig, err := service.GetIceServerConfig(&isci)
 	if err != nil {
+		ftCtx.RequestLogger.Error().Err(err).Msg("cfg returned error")
 		return make([]WebRTCIceServer, 0), nil
 	}
-	iceServerList := make([]WebRTCIceServer, len(iceConfig.IceServerList))
+	ftCtx.RequestLogger.Debug().Int("servers", len(iceConfig.IceServerList)).Msg("cfg returned without error")
+	iceServerList := make([]WebRTCIceServer, 0)
 	for _, server := range iceConfig.IceServerList {
 		iceServer := WebRTCIceServer{
 			Password: *server.Password,
@@ -110,8 +113,10 @@ func findIceServers(channelARN, deviceID string) ([]WebRTCIceServer, error) {
 			Ttl:      *server.Ttl,
 			Uris:     server.Uris,
 		}
+		ftCtx.RequestLogger.Debug().Str("username", *server.Username).Int("uris", len(server.Uris)).Msg("found a server")
 		iceServerList = append(iceServerList, iceServer)
 	}
+	ftCtx.RequestLogger.Debug().Int("total servers", len(iceServerList)).Msg("servers result")
 	return iceServerList, nil
 }
 
