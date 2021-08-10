@@ -15,6 +15,7 @@ import (
 	kvs "github.com/aws/aws-sdk-go-v2/service/kinesisvideo"
 	"github.com/aws/aws-sdk-go-v2/service/kinesisvideo/types"
 	kvsc "github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling"
+	kvsct "github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling/types"
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 )
 
@@ -71,7 +72,10 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 		return services, err
 	}
 
-	iceServers, err := findIceServers(ftCtx, channelARN, deviceId)
+	if len(channelEndpoint.ResourceEndpointList) == 0 {
+		return services, fmt.Errorf("no signaling endpoints found")
+	}
+	iceServers, err := findIceServers(ftCtx, channelARN, deviceId, *channelEndpoint.ResourceEndpointList[0].ResourceEndpoint)
 	if nil != err {
 		return services, err
 	}
@@ -89,14 +93,13 @@ func GetServices(ftCtx awsproxy.FTContext, channelARN, deviceId string, viewer b
 	return WebRTCService{SignedURI: signedURI, IceServers: iceServers}, err
 }
 
-func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID string) ([]WebRTCIceServer, error) {
-	// st := kvsc.ServiceTurn
-	service := getVideoSignaling(ftCtx)
+func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID, channelEndpoint string) ([]WebRTCIceServer, error) {
+	service := getVideoSignaling(ftCtx, channelEndpoint)
 	ftCtx.RequestLogger.Debug().Msg("got ice server service")
 	isci := kvsc.GetIceServerConfigInput{
 		ChannelARN: &channelARN,
-		// ClientId:   &deviceID,
-		// Service: &st,
+		ClientId:   &deviceID,
+		Service:    kvsct.ServiceTurn,
 	}
 	iceConfig, err := service.GetIceServerConfig(ftCtx.Context, &isci)
 	if err != nil {
@@ -165,8 +168,19 @@ func getVideoService(ftCtx awsproxy.FTContext) *kvs.Client {
 	return kvs.NewFromConfig(cfg)
 }
 
-func getVideoSignaling(ftCtx awsproxy.FTContext) *kvsc.Client {
-	cfg, err := config.LoadDefaultConfig(ftCtx.Context)
+func getVideoSignaling(ftCtx awsproxy.FTContext, channelEndpoint string) *kvsc.Client {
+	channelResolver := aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
+		if service == kvsc.ServiceID {
+			return aws.Endpoint{
+				PartitionID:   "aws",
+				URL:           channelEndpoint,
+				SigningRegion: "ca-central-1",
+			}, nil
+		}
+		// returning EndpointNotFoundError will allow the service to fallback to it's default resolution
+		return aws.Endpoint{}, &aws.EndpointNotFoundError{}
+	})
+	cfg, err := config.LoadDefaultConfig(ftCtx.Context, config.WithEndpointResolver(channelResolver))
 	if err != nil {
 		// handle error
 	}
