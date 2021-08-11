@@ -27,8 +27,8 @@ type WebRTCIceServer struct {
 }
 
 type WebRTCService struct {
-	SignedURI  string
-	IceServers []WebRTCIceServer
+	SignedURI  string            `json:"signedURI"`
+	IceServers []WebRTCIceServer `json:"iceServers"`
 }
 
 func CreateChannel(ftCtx awsproxy.FTContext, deviceId string) (string, error) {
