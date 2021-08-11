@@ -108,6 +108,9 @@ func findIceServers(ftCtx awsproxy.FTContext, channelARN, deviceID, channelEndpo
 	}
 	ftCtx.RequestLogger.Debug().Int("servers", len(iceConfig.IceServerList)).Msg("cfg returned without error")
 	iceServerList := make([]WebRTCIceServer, 0)
+	iceServerList = append(iceServerList, WebRTCIceServer{
+		Uris: []string{"stun:stun.kinesisvideo.ca-central-1.amazonaws.com:443"},
+	})
 	for _, server := range iceConfig.IceServerList {
 		iceServer := WebRTCIceServer{
 			Password: *server.Password,
