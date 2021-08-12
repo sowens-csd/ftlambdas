@@ -308,6 +308,7 @@ func createGroupMembers(ftCtx awsproxy.FTContext, queryResults []ftdb.FolktellsR
 				GroupID:        result.GroupID,
 				MemberID:       result.MemberID,
 				MemberEmail:    result.MemberEmail,
+				MemberName:     result.MemberName,
 				InvitedByID:    result.InvitedByID,
 				InvitedByEmail: result.InvitedByEmail,
 				InviteAccepted: result.InviteAccepted,
@@ -329,6 +330,7 @@ func (groupMember *GroupMember) Save(ctx awsproxy.FTContext) (bool, bool, bool, 
 		ctx.RequestLogger.Debug().Str("memberID", groupMember.MemberID).Str(
 			"invitationID", groupMember.InvitationID).Str(
 			"MemberEmail", groupMember.MemberEmail).Str(
+			"MemberName", groupMember.MemberName).Str(
 			"InvitedByID", groupMember.InvitedByID).Str(
 			"groupID", groupMember.GroupID).Str(
 			"inviteAccepted", groupMember.InviteAccepted).Str(

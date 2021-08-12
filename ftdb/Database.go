@@ -27,6 +27,7 @@ type FolktellsRecord struct {
 	AlbumReference   string `json:"albumReference,omitempty" dynamodbav:"albumReference,omitempty"`
 	GroupID          string `json:"groupId,omitempty" dynamodbav:"groupId,omitempty"`
 	MemberEmail      string `json:"memberEmail,omitempty" dynamodbav:"memberEmail,omitempty"`
+	MemberName       string `json:"memberName,omitempty" dynamodbav:"memberName,omitempty"`
 	MemberID         string `json:"memberId,omitempty" dynamodbav:"memberId,omitempty"`
 	CreatedAt        int    `json:"createdAt,omitempty" dynamodbav:"createdAt,omitempty"`
 	LastUpdated      int    `json:"lastUpdated,omitempty" dynamodbav:"lastUpdated,omitempty"`
