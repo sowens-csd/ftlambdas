@@ -2,6 +2,7 @@ package ftlambdas
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/sowens-csd/ftlambdas/awsproxy"
@@ -18,18 +19,25 @@ func UpdateOrDeleteUser(ftCtx awsproxy.FTContext, onlineUserJSON string) error {
 	if nil != err {
 		return err
 	}
+	ou, err := sharing.LoadOnlineUser(ftCtx, ftCtx.UserID)
+	if nil != err {
+		ftCtx.RequestLogger.Info().Err(err).Msg(("can't load current user"))
+		return err
+	}
+	if ou.ID != onlineUser.ID {
+		ftCtx.RequestLogger.Info().Str("received", onlineUser.ID).Str("auth", ou.ID).Msg(("user ID mismatch"))
+		return fmt.Errorf("Wrong user ID %s", onlineUser.ID)
+	}
 	if onlineUser.Deleted == ftdb.DeleteRemove {
 		sharing.DeleteStoriesForUser(ftCtx)
 		sharing.DeleteGroupsForUser(ftCtx)
-		ou, err := sharing.LoadOnlineUser(ftCtx, ftCtx.UserID)
-		if nil != err {
-			ftCtx.RequestLogger.Info().Err(err).Msg(("can't load user"))
-			return err
-		}
 		ftauth.DeleteAuthentication(ftCtx, ou.Email)
 		ftdb.DeleteItem(ftCtx, ftdb.ResourceIDFromTransactionID(ou.OriginalTransactionID), ftdb.ReferenceIDFromUserID(ou.ID))
 		ou.Delete(ftCtx)
 		return nil
+	}
+	if ou.Name != onlineUser.Name {
+		sharing.UpdateMemberName(ftCtx, onlineUser.Name)
 	}
 	return sharing.UpdateOnlineUser(ftCtx, onlineUserJSON)
 }

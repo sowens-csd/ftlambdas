@@ -110,6 +110,38 @@ func UpdateGroupMembership(ctx awsproxy.FTContext, membershipJSON string) error 
 	return err
 }
 
+// UpdateMemberName update all group membership records to reflect the new
+// member name.
+func UpdateMemberName(ftCtx awsproxy.FTContext, name string) error {
+	type memberUpdate struct {
+		Name string `json:":n" dynamodbav:":n"`
+	}
+	groups, err := FindGroupsForUser(ftCtx)
+	if nil != err {
+		return err
+	}
+	referenceID := ftdb.ReferenceIDFromUserID(ftCtx.UserID)
+	for _, groupID := range groups {
+		update, err := attributevalue.MarshalMap(memberUpdate{
+			Name: name,
+		})
+		if err != nil {
+			return err
+		}
+		resourceID := ftdb.ResourceIDFromGroupID(groupID)
+		_, err = ftCtx.DBSvc.UpdateItem(ftCtx.Context, &dynamodb.UpdateItemInput{
+			TableName: aws.String(ftdb.GetTableName()),
+			Key: map[string]types.AttributeValue{
+				ftdb.ResourceIDField:  &types.AttributeValueMemberS{Value: resourceID},
+				ftdb.ReferenceIDField: &types.AttributeValueMemberS{Value: referenceID},
+			},
+			UpdateExpression:          aws.String("set memberName = :n"),
+			ExpressionAttributeValues: update,
+		})
+	}
+	return nil
+}
+
 // AreInSameGroup returns true if the current user and the supplied user are both
 // active members of the same group
 func AreInSameGroup(ftCtx awsproxy.FTContext, otherUserID string) (bool, error) {
