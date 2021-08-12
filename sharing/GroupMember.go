@@ -118,6 +118,7 @@ func UpdateMemberName(ftCtx awsproxy.FTContext, name string) error {
 	}
 	groups, err := FindGroupsForUser(ftCtx)
 	if nil != err {
+		ftCtx.RequestLogger.Info().Err(err).Msg("failed finding groups")
 		return err
 	}
 	referenceID := ftdb.ReferenceIDFromUserID(ftCtx.UserID)
@@ -129,6 +130,7 @@ func UpdateMemberName(ftCtx awsproxy.FTContext, name string) error {
 			return err
 		}
 		resourceID := ftdb.ResourceIDFromGroupID(groupID)
+		ftCtx.RequestLogger.Info().Str("resourceID", resourceID).Str("referenceID", referenceID).Msg("updating member")
 		_, err = ftCtx.DBSvc.UpdateItem(ftCtx.Context, &dynamodb.UpdateItemInput{
 			TableName: aws.String(ftdb.GetTableName()),
 			Key: map[string]types.AttributeValue{
@@ -138,6 +140,9 @@ func UpdateMemberName(ftCtx awsproxy.FTContext, name string) error {
 			UpdateExpression:          aws.String("set memberName = :n"),
 			ExpressionAttributeValues: update,
 		})
+		if nil != err {
+			ftCtx.RequestLogger.Info().Str("resourceID", resourceID).Str("referenceID", referenceID).Err(err).Msg("error updating member name")
+		}
 	}
 	return nil
 }
