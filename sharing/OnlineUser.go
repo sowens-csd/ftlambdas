@@ -476,7 +476,7 @@ func (ou *OnlineUser) Update(ctx awsproxy.FTContext) error {
 	ctx.RequestLogger.Debug().Str("userID", ou.ID).Str("name", ou.Name).Bool("OptOut", ou.EmailOptOut).Msg("Updating to")
 	resourceID := ftdb.ResourceIDFromUserID(ou.ID)
 	type userUpdate struct {
-		Name        string `json:":d" dynamodbav:":d"`
+		Name        string `json:":n" dynamodbav:":n"`
 		EmailOptOut bool   `json:":e" dynamodbav:":e"`
 		CallChannel string `json:":c" dynamodbav:":c"`
 		CallPeerId  string `json:":p" dynamodbav:":p"`
@@ -496,7 +496,7 @@ func (ou *OnlineUser) Update(ctx awsproxy.FTContext) error {
 			ftdb.ResourceIDField:  &types.AttributeValueMemberS{Value: resourceID},
 			ftdb.ReferenceIDField: &types.AttributeValueMemberS{Value: resourceID},
 		},
-		UpdateExpression:          aws.String("set displayName = :d, emailOptOut = :e, channelName = :c, callPeerId = :p"),
+		UpdateExpression:          aws.String("set name = :n, emailOptOut = :e, channelName = :c, callPeerId = :p"),
 		ExpressionAttributeValues: update,
 	})
 
