@@ -60,12 +60,20 @@ type storyInfo struct {
 	CallType        string `json:"callType,omitempty"`
 }
 
+type callDestination struct {
+	Email     string `json:"email"`
+	UserIDStr string `json:"userIdStr"`
+	Nickname  string `json:"nickname"`
+}
+
 type callInfo struct {
-	SessionID       string `json:"sessionId"`
-	CallChannel     string `json:"callChannel,omitempty"`
-	DeviceID        string `json:"deviceId,omitempty"`
-	CallingUserName string `json:"callingUserName,omitempty"`
-	CallType        string `json:"callType,omitempty"`
+	SessionID       string            `json:"sessionId"`
+	CallChannel     string            `json:"callChannel,omitempty"`
+	DeviceID        string            `json:"deviceId,omitempty"`
+	CallingUserName string            `json:"callingUserName,omitempty"`
+	CallType        string            `json:"callType,omitempty"`
+	AddMember       string            `json:"addMember,omitempty"`
+	CallMembers     []callDestination `json:"callMembers,omitempty"`
 }
 
 type commandResult struct {
