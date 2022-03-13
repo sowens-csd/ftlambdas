@@ -271,7 +271,7 @@ func SendFCM(ftCtx awsproxy.FTContext, data interface{}, pushNotification *pushN
 	}
 	if nil == pushNotification {
 		normal := 5
-		contentAvailable := true
+		contentAvailable := false
 		fcm.APNSPriority = &normal
 		fcm.ContentAvailable = &contentAvailable
 	} else {
