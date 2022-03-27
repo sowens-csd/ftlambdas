@@ -1,0 +1,32 @@
+go 1.18
+
+use (
+	./ftlambdas
+	./r2/addDevice_verify
+	./r2/app_usage
+	./r2/connection_handler
+	./r2/delete_group
+	./r2/device_token
+	./r2/disconnection_handler
+	./r2/group_member
+	./r2/group_members
+	./r2/jwtAuthorizer
+	./r2/new_group
+	./r2/new_story
+	./r2/p2p_lookup
+	./r2/passwordlessAuthorizer
+	./r2/remote_command
+	./r2/signup
+	./r2/signup_verify
+	./r2/sms_assignnumber
+	./r2/sms_getnumber
+	./r2/sms_receive
+	./r2/stories
+	./r2/user
+	./r2/user_by_email
+	./r2/user_post
+	./r2/verify_receipt
+	./r2/webrtc_channel
+	./r2/webrtc_service
+	./r2/websocketAuthorizer
+)
