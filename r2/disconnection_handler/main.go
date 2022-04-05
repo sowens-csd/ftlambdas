@@ -23,7 +23,7 @@ func handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 	}
 	// err := redis.Client.Do(radix.Cmd(&result, "SADD", "connections", req.RequestContext.ConnectionID))
 	ftCtx.RequestLogger.Debug().Str("user", ftCtx.UserID).Str("connection", request.RequestContext.ConnectionID).Msg("Disconnection handler called")
-	err := messaging.RemoveConnection(ftCtx, request.RequestContext.ConnectionID)
+	err := messaging.RemoveConnection(ftCtx, ftCtx.UserID, request.RequestContext.ConnectionID)
 	if nil != err {
 		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
 	}

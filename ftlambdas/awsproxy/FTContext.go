@@ -44,6 +44,8 @@ type FTContext struct {
 	DBSvc         FTDynamoAPI
 	RequestLogger zerolog.Logger
 	EmailSvc      emailSender
+	DomainName    string
+	Stage         string
 }
 
 // NewFromContext create a new FTContext from an inbound proxy context
@@ -94,6 +96,8 @@ func NewFromContextAndClaims(ctx context.Context, request Request) (FTContext, *
 		DBSvc:         svc,
 		RequestLogger: requestLogger,
 		EmailSvc:      &sesEmailSender{},
+		DomainName:    request.RequestContext.DomainName,
+		Stage:         request.RequestContext.Stage,
 	}, nil
 }
 
@@ -130,6 +134,8 @@ func NewFromContextAndJWT(ctx context.Context, request Request) (FTContext, *Res
 		DBSvc:         svc,
 		RequestLogger: requestLogger,
 		EmailSvc:      &sesEmailSender{},
+		DomainName:    request.RequestContext.DomainName,
+		Stage:         request.RequestContext.Stage,
 	}, nil
 }
 
@@ -166,6 +172,8 @@ func NewFromWebsocketContextAndJWT(ctx context.Context, request events.APIGatewa
 		DBSvc:         svc,
 		RequestLogger: requestLogger,
 		EmailSvc:      &sesEmailSender{},
+		DomainName:    request.RequestContext.DomainName,
+		Stage:         request.RequestContext.Stage,
 	}, nil
 }
 

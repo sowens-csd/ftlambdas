@@ -22,8 +22,12 @@ func handler(ctx context.Context, request events.APIGatewayCustomAuthorizerReque
 	if len(tokenSlice) > 1 {
 		bearerToken = tokenSlice[len(tokenSlice)-1]
 	} else {
-		ftCtx.RequestLogger.Info().Msg("Token missing or invalid format, expected 'bearer {token}'.")
-		return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+		bearerToken = request.QueryStringParameters["token"]
+		ftCtx.RequestLogger.Debug().Msg("header not found, checking query param {token}.")
+		if bearerToken == "" {
+			ftCtx.RequestLogger.Info().Msg("Token missing or invalid format, expected 'bearer {token}' or {token} query parameter.")
+			return events.APIGatewayCustomAuthorizerResponse{}, errors.New("Unauthorized")
+		}
 	}
 
 	userID, email, err := ftauth.AuthorizeUser(ftCtx, bearerToken, time.Now)

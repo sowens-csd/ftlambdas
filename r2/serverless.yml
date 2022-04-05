@@ -612,6 +612,7 @@ functions:
       include:
         - ./bin/connection_handler
     environment:
+      storyTable: ${self:custom.storyTable}
       LOG_LEVEL: "debug"
   disconnectionHandler:
     handler: bin/disconnection_handler
@@ -621,6 +622,9 @@ functions:
     package:
       include:
         - ./bin/disconnection_handler
+    environment:
+      storyTable: ${self:custom.storyTable}
+      LOG_LEVEL: "debug"
   # defaultHandler:
   #   handler: bin/socketMessageHandler
   #   events:

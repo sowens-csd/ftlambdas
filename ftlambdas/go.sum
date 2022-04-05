@@ -26,6 +26,8 @@ github.com/aws/aws-sdk-go-v2 v1.7.1 h1:TswSc7KNqZ/K1Ijt3IkpXk/2+62vi3Q82Yrr5wSbR
 github.com/aws/aws-sdk-go-v2 v1.7.1/go.mod h1:L5LuPC1ZgDr2xQS7AmIec/Jlc7O/Y1u2KxJyNVab250=
 github.com/aws/aws-sdk-go-v2 v1.8.0 h1:HcN6yDnHV9S7D69E7To0aUppJhiJNEzQSNcUxc7r3qo=
 github.com/aws/aws-sdk-go-v2 v1.8.0/go.mod h1:xEFuWz+3TYdlPRuo+CqATbeDWIWyaT5uAPwPaWtgse0=
+github.com/aws/aws-sdk-go-v2 v1.16.1 h1:udzee98w8H6ikRgtFdVN9JzzYEbi/quFfSvduZETJIU=
+github.com/aws/aws-sdk-go-v2 v1.16.1/go.mod h1:ytwTPBG6fXTZLxxeeCCWj2/EMYp/xDUgX+OET6TLNNU=
 github.com/aws/aws-sdk-go-v2/config v1.1.6 h1:tg8KyxrxDt1CrYmZXWs9lc6IFE1yxtk9kn6eS/v2fdA=
 github.com/aws/aws-sdk-go-v2/config v1.1.6/go.mod h1:Kx90DDOgkMpRfSkzGbF13AVXHHfBNct1liO+95KxXsU=
 github.com/aws/aws-sdk-go-v2/config v1.1.7 h1:I9AsaodDiw1WbUBn8b4Ktvr2ltPBe7QfLq4UUZY4GsY=
@@ -80,6 +82,10 @@ github.com/aws/aws-sdk-go-v2/internal/configsources v1.0.1 h1:1Q713GXCiz97619PtN
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.0.1/go.mod h1:H2dIRXkSkAPkxIA74UD1wYu0eS+cQxJcPKSmsfeZLUc=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.0.2 h1:XoUsttt4QDoLc6w2jfcpagdViP3SxOcNB4ufMzJqncI=
 github.com/aws/aws-sdk-go-v2/internal/configsources v1.0.2/go.mod h1:1QsSZvLUuaQ6VJsCXolYCEzV0mVBkNBp64pIJy9yRks=
+github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.8 h1:CDaO90VZVBAL1sK87S5oSPIrp7yZqORv1hPIi2UsTMk=
+github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.8/go.mod h1:LnTQMTqbKsbtt+UI5+wPsB7jedW+2ZgozoPG8k6cMxg=
+github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.2 h1:XXR3cdOcKRCTZf6ctcqpMf+go1BdzTm6+T9Ul5zxcMI=
+github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.2/go.mod h1:1x4ZP3Z8odssdhuLI+/1Tqw6Pt/VAaP4Tr8EUxHvPXE=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.0.0 h1:k7I9E6tyVWBo7H9ffpnxDWudtjau6Qt9rnOYgV+ciEQ=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.0.0/go.mod h1:g3XMXuxvqSMUjnsXXp/960152w0wFS4CXVYgQaSVOHE=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.1.0 h1:DJq/vXXF+LAFaa/kQX9C6arlf4xX4uaaqGWIyAKOCpM=
@@ -88,6 +94,8 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.1.1 h1:SDLwr1NKyowP7uqxuLNdvFZhjnoV
 github.com/aws/aws-sdk-go-v2/internal/ini v1.1.1/go.mod h1:Zy8smImhTdOETZqfyn01iNOe0CNggVbPjCajyaz6Gvg=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.2.0 h1:xu45foJnwMwBqSkIMKyJP9kbyHi5hdhZ/WiJ7D2sHZ0=
 github.com/aws/aws-sdk-go-v2/internal/ini v1.2.0/go.mod h1:Q5jATQc+f1MfZp3PDMhn6ry18hGvE0i8yvbXoKbnZaE=
+github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi v1.10.2 h1:/7hDilZSq0K3zD2/0FMC9+olC8CvdoHcPkAzDzhlw90=
+github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi v1.10.2/go.mod h1:kJ3f+gbR/3CX3TZZuspQte4b4UBCuSadGqV1hWVCPFY=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.2.2 h1:8tA7Go+R0crArjhD+Cu7QKmhSy+F24Ll1WHzQN/VOGY=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.2.2/go.mod h1:1/onFSTaj5Pz/pI/3YjomZQcx1BYdttnOJUJVKSOh7A=
 github.com/aws/aws-sdk-go-v2/service/dynamodb v1.2.3 h1:6riWCax3yf7BfWeqnrJb1b50X/qO8nYhqLefVWNdUbc=
@@ -222,6 +230,8 @@ github.com/aws/smithy-go v1.6.0 h1:T6puApfBcYiTIsaI+SYWqanjMt5pc3aoyyDrI+0YH54=
 github.com/aws/smithy-go v1.6.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
 github.com/aws/smithy-go v1.7.0 h1:+cLHMRrDZvQ4wk+KuQ9yH6eEg6KZEJ9RI2IkDqnygCg=
 github.com/aws/smithy-go v1.7.0/go.mod h1:SObp3lf9smib00L/v3U2eAKG8FyQ7iLrJnQiAmR5n+E=
+github.com/aws/smithy-go v1.11.2 h1:eG/N+CcUMAvsdffgMvjMKwfyDzIkjM6pfxMJ8Mzc6mE=
+github.com/aws/smithy-go v1.11.2/go.mod h1:3xHYmszWVx2c0kIwQeEVf9uSm4fYZt67FBJnwub1bgM=
 github.com/coreos/go-systemd v0.0.0-20190321100706-95778dfbb74e/go.mod h1:F5haX7vjVVG0kc13fIWeqUViNPyEJxv/OmvnBo0Yme4=
 github.com/coreos/go-systemd/v22 v22.3.2/go.mod h1:Y58oyj3AT4RCenI/lSvhwexgC+NSVTIJ3seZv2GcEnc=
 github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d/go.mod h1:maD7wRr/U5Z6m/iR4s+kqSMx2CaBsrgA7czyZG/E6dU=
@@ -233,6 +243,7 @@ github.com/godbus/dbus/v5 v5.0.4/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5x
 github.com/google/go-cmp v0.5.2/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.4/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
 github.com/google/go-cmp v0.5.6/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/gNBxE=
+github.com/google/go-cmp v0.5.7/go.mod h1:n+brtR0CgQNWTVd5ZUFpTBC8YFBDLK/h/bpaJ8/DtOE=
 github.com/google/go-querystring v1.1.0 h1:AnCroh3fv4ZBgVIf1Iwtovgjaw/GiKJo8M8yD/fhyJ8=
 github.com/google/go-querystring v1.1.0/go.mod h1:Kcdr2DB4koayq7X8pmAG4sNG59So17icRSOU623lUBU=
 github.com/jmespath/go-jmespath v0.4.0 h1:BEgLn5cpjn8UN1mAw4NjwDrS35OdebyEtFe+9YPoQUg=
