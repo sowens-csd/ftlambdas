@@ -22,7 +22,7 @@ func handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 		return *errResp, nil
 	}
 	// err := redis.Client.Do(radix.Cmd(&result, "SADD", "connections", req.RequestContext.ConnectionID))
-	ftCtx.RequestLogger.Debug().Str("user", ftCtx.UserID).Str("connection", request.RequestContext.ConnectionID).Msg("Connection handler called")
+	ftCtx.RequestLogger.Debug().Str("user", ftCtx.UserID).Str("domain", request.RequestContext.DomainName).Str("connection", request.RequestContext.ConnectionID).Msg("Connection handler called")
 	err := messaging.RecordConnection(ftCtx, request.RequestContext.ConnectionID)
 	if nil != err {
 		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
