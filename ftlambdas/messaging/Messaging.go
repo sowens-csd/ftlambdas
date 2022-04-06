@@ -14,12 +14,22 @@ type socketConnection struct {
 }
 
 func RecordConnection(ftCtx awsproxy.FTContext, connectionID string) error {
-	return ftdb.PutItem(ftCtx, ftdb.ResourceIDFromUserID(ftCtx.UserID), referenceIDFromConnectionID(connectionID),
+	ftCtx.RequestLogger.Debug().Str("userID", ftCtx.UserID).Str("connectionID", connectionID).Msg("Recording connection")
+	err := ftdb.PutItem(ftCtx, ftdb.ResourceIDFromUserID(ftCtx.UserID), referenceIDFromConnectionID(connectionID),
 		socketConnection{ConnectionID: connectionID, ID: ftCtx.UserID, CreatedAt: ftdb.NowMillisecondsSinceEpoch()})
+	if nil != err {
+		ftCtx.RequestLogger.Info().Str("userID", ftCtx.UserID).Str("connectionID", connectionID).Err(err).Msg("Recording connection failed")
+	}
+	return err
 }
 
 func RemoveConnection(ftCtx awsproxy.FTContext, userID, connectionID string) error {
-	return ftdb.DeleteItem(ftCtx, ftdb.ResourceIDFromUserID(userID), referenceIDFromConnectionID(connectionID))
+	ftCtx.RequestLogger.Debug().Str("userID", ftCtx.UserID).Str("connectionID", connectionID).Msg("Removing connection")
+	err := ftdb.DeleteItem(ftCtx, ftdb.ResourceIDFromUserID(userID), referenceIDFromConnectionID(connectionID))
+	if nil != err {
+		ftCtx.RequestLogger.Info().Str("userID", ftCtx.UserID).Str("connectionID", connectionID).Err(err).Msg("Recording connection failed")
+	}
+	return err
 }
 
 func LoadUserConnections(ftCtx awsproxy.FTContext, userID string) ([]string, error) {

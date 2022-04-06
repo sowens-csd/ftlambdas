@@ -85,10 +85,10 @@ func newAPIGatewayManagementClient(ftCtx awsproxy.FTContext, cfg *aws.Config, do
 	cp := cfg.Copy()
 	cp.EndpointResolver = aws.EndpointResolverFunc(func(service, region string) (aws.Endpoint, error) {
 		ftCtx.RequestLogger.Debug().Str("service", service).Str("region", region).Msg("resolving endpoint")
-		if service != "execute-api" {
-			ftCtx.RequestLogger.Debug().Bool("nilCfg", nil == cfg).Bool("nilResolver", nil == cfg.EndpointResolver).Msg("default endpoint resolver")
-			return aws.Endpoint{}, &aws.EndpointNotFoundError{}
-		}
+		// if service != "execute-api" {
+		// 	ftCtx.RequestLogger.Debug().Bool("nilCfg", nil == cfg).Bool("nilResolver", nil == cfg.EndpointResolver).Msg("default endpoint resolver")
+		// 	return aws.Endpoint{}, &aws.EndpointNotFoundError{}
+		// }
 
 		var endpoint url.URL
 		endpoint.Path = stage
