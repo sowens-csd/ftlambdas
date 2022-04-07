@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+// EndpointHostResourceID the ResourceID and ReferenceID of the record that contains the endpoint host
+// name for web socket use
+const EndpointHostResourceID = "CFG#EndpointHost"
+
 // All group records have this prefix, group to group, group to member and group to story
 const groupKeyPrefix = "G#"
 

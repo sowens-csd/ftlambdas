@@ -10,6 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftdb"
 	"github.com/sowens-csd/ftlambdas/messaging"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
@@ -23,6 +24,15 @@ var cfg aws.Config
 // across subsequent AWS Lambda invocations. This potentially amortizes the instance creation over multiple executions
 // of the AWS Lambda instance.
 var apiClient *apigatewaymanagementapi.Client
+
+type endpointItem struct {
+	EndpointHost string `json:"endpointHost" dynamodbav:"endpointHost"`
+}
+
+// endpointHost holds the current value of the host name that can be used to reach the Amazon API Gateway endpoint.
+// This value is only available in the initial connect call so it is stored in DynamoDB
+// and then initialized in the initHost function
+var endpointHost string
 
 // SendCommand sends the provided command to all users in the same group.
 func SendCommand(ftCtx awsproxy.FTContext, details commandDetails) error {
@@ -49,6 +59,32 @@ func SendCommand(ftCtx awsproxy.FTContext, details commandDetails) error {
 	}
 
 	return nil
+}
+
+// InitHost get the domainName from the DB or set it if it doesn't exist
+func InitHost(ftCtx awsproxy.FTContext, domainName string) error {
+	if len(endpointHost) > 0 {
+		return nil
+	}
+	item := endpointItem{}
+	found, err := ftdb.GetItem(ftCtx, ftdb.EndpointHostResourceID, ftdb.EndpointHostResourceID, &item)
+	if nil == err {
+		if found {
+			endpointHost = item.EndpointHost
+			ftCtx.RequestLogger.Debug().Str("host", item.EndpointHost).Msg("set endpoint host")
+		} else {
+			if len(domainName) > 0 {
+				endpointHost = domainName
+				ftCtx.RequestLogger.Debug().Str("host", domainName).Msg("put endpoint host")
+				err = ftdb.PutItem(ftCtx, ftdb.EndpointHostResourceID, ftdb.EndpointHostResourceID, endpointItem{EndpointHost: domainName})
+			}
+		}
+	}
+	if len(endpointHost) == 0 {
+		ftCtx.RequestLogger.Info().Msg("no endpoint host found")
+		panic("no endpoint host found")
+	}
+	return err
 }
 
 // publish publishes the provided data to the provided Amazon API Gateway connection ID. A common failure scenario which
@@ -92,7 +128,7 @@ func newAPIGatewayManagementClient(ftCtx awsproxy.FTContext, cfg *aws.Config, do
 
 		var endpoint url.URL
 		endpoint.Path = stage
-		endpoint.Host = "7m9oa3fcn6.execute-api.ca-central-1.amazonaws.com"
+		endpoint.Host = endpointHost // "7m9oa3fcn6.execute-api.ca-central-1.amazonaws.com"
 		endpoint.Scheme = "https"
 		ftCtx.RequestLogger.Debug().Str("url", endpoint.String()).Msg("resolved endpoint")
 		return aws.Endpoint{

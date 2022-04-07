@@ -14,7 +14,11 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 	if nil != errResp {
 		return *errResp, nil
 	}
-	err := notification.SendFromCommand(ftCtx, request.Body)
+	err := notification.InitHost(ftCtx, "")
+	if nil != err {
+		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
+	}
+	err = notification.SendFromCommand(ftCtx, request.Body)
 	if nil != err {
 		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
 	}

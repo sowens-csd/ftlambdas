@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/sowens-csd/ftlambdas/awsproxy"
 	"github.com/sowens-csd/ftlambdas/messaging"
+	"github.com/sowens-csd/ftlambdas/notification"
 )
 
 func main() {
@@ -21,9 +22,12 @@ func handler(ctx context.Context, request events.APIGatewayWebsocketProxyRequest
 	if nil != errResp {
 		return *errResp, nil
 	}
-	// err := redis.Client.Do(radix.Cmd(&result, "SADD", "connections", req.RequestContext.ConnectionID))
+	err := notification.InitHost(ftCtx, request.RequestContext.DomainName)
+	if nil != err {
+		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
+	}
 	ftCtx.RequestLogger.Debug().Str("user", ftCtx.UserID).Str("domain", request.RequestContext.DomainName).Str("connection", request.RequestContext.ConnectionID).Msg("Connection handler called")
-	err := messaging.RecordConnection(ftCtx, request.RequestContext.ConnectionID)
+	err = messaging.RecordConnection(ftCtx, request.RequestContext.ConnectionID)
 	if nil != err {
 		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
 	}
