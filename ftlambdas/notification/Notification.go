@@ -75,6 +75,10 @@ func SendFromCommand(ftCtx awsproxy.FTContext, command string) error {
 		return fmt.Errorf("Current user is not an active member in a group with DestinationUserID")
 	}
 	if details.CommandChannel == "socket" {
+		err := InitHost(ftCtx, "")
+		if nil != err {
+			return err
+		}
 		return SendCommand(ftCtx, details)
 	} else {
 		destinationUser, err := sharing.LoadOnlineUser(ftCtx, details.ToUser)

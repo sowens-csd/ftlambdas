@@ -155,8 +155,8 @@ func QueryByResource(ftCtx awsproxy.FTContext, resID string) ([]FolktellsRecord,
 }
 
 // returns the time in ms since the epoch
-func NowMillisecondsSinceEpoch() int64 {
+func NowMillisecondsSinceEpoch() int {
 	now := time.Now()
-	nanos := now.UnixNano()
-	return nanos / 1000000
+	millis := now.Unix() * 1000
+	return int(millis)
 }

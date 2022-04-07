@@ -10,7 +10,7 @@ import (
 type socketConnection struct {
 	ID           string `json:"id,omitempty" dynamodbav:"id,omitempty"`
 	ConnectionID string `json:"connectionId,omitempty" dynamodbav:"connectionId,omitempty"`
-	CreatedAt    int64  `json:"createdAt,omitempty" dynamodbav:"createdAt,omitempty"`
+	CreatedAt    int    `json:"createdAt,omitempty" dynamodbav:"createdAt,omitempty"`
 }
 
 func RecordConnection(ftCtx awsproxy.FTContext, connectionID string) error {

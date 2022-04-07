@@ -3,7 +3,6 @@ package sharing
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 
@@ -45,7 +44,7 @@ type OnlineUser struct {
 	ID                    string                    `json:"id" dynamodbav:"id"`
 	Name                  string                    `json:"name" dynamodbav:"name"`
 	Email                 string                    `json:"email" dynamodbav:"email"`
-	CreatedAt             string                    `json:"createdAt" dynamodbav:"createdAt"`
+	CreatedAt             int                       `json:"createdAt" dynamodbav:"createdAt"`
 	InviteAccepted        string                    `json:"inviteAccepted" dynamodbav:"inviteAccepted"`
 	SharingProductID      string                    `json:"sharingProductId,omitempty" dynamodbav:"sharingProductId"`
 	SharingExpiry         int64                     `json:"sharingExpiry,omitempty" dynamodbav:"sharingExpiry"`
@@ -441,8 +440,8 @@ func (ou *OnlineUser) saveUserToDB(ctx awsproxy.FTContext) error {
 	referenceID := resourceID
 	now := time.Now()
 	sec := int(now.UTC().Unix() * 1000)
-	if len(ou.CreatedAt) == 0 {
-		ou.CreatedAt = strconv.Itoa(sec)
+	if ou.CreatedAt == 0 {
+		ou.CreatedAt = int(sec)
 	}
 	err := ftdb.PutItem(ctx, resourceID, referenceID, ou)
 	if nil != err {
