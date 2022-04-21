@@ -38,6 +38,7 @@ type pushNotification struct {
 	Title string `json:"title,omitempty"`
 	Body  string `json:"body,omitempty"`
 	Badge string `json:"badge,omitempty"`
+	Sound string `json:"sound,omitempty"`
 }
 
 type commandNotification struct {
