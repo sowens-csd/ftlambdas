@@ -1,6 +1,8 @@
 go 1.18
 
 use (
+	./community/api
+	./community/jwtAuthorizer
 	./ftlambdas
 	./r2/addDevice_verify
 	./r2/app_usage

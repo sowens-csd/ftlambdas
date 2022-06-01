@@ -1,0 +1,224 @@
+# For full config options, check the docs:
+#    docs.serverless.com
+
+service: folktellsadmin
+#app: your-app-name
+#tenant: your-tenant-name
+
+# You can pin your service to only deploy with a specific Serverless version
+# Check out our docs for more details
+# frameworkVersion: "=X.X.X"
+frameworkVersion: '>=1.28.0 <2.0.0'
+
+custom:
+  stage: ${opt:stage, self:provider.stage}
+  alerts:
+    stages:
+      - prod
+      - dev
+    topics:
+      alarm:
+        topic: ${self:service}-${opt:stage, self:provider.stage}-alerts-alarm
+        notifications:
+          - protocol: email
+            endpoint: support@folktells.com 
+    alarms:
+      - functionErrors
+      - functionThrottles
+  customDomain:
+    domainName: ${self:custom.myEnvironment.apiDomain.${self:custom.stage}}
+    basePath: admin
+    stage: ${self:provider.stage}
+    createRoute53Record: true
+  pythonRequirements:
+     dockerizePip: true
+  # Configures throttling settings for all http endpoints
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 1000
+    maxConcurrentRequests: 2000
+  storyTable: ${self:custom.stage}-story
+  myEnvironment: 
+    stageRole:
+      prod: arn:aws:iam::743418793984:role/folktellsadmin-proddeploy-CfnRole-1P0OEGSCCYAN
+      dev: arn:aws:iam::788541814854:role/FolktellsAdminDevDeploy-CfnRole-1W5MRHMZ3Z3RH
+    # these ARNs are for Lambda permissions and Lambdas can use ca-central-1
+    storyTableArn:
+      prod: "arn:aws:dynamodb:ca-central-1:743418793984:table/prod-story"
+      dev: "arn:aws:dynamodb:ca-central-1:788541814854:table/dev-story"
+    apiDomain:
+      prod: "api.folktells.com"
+      dev: "devapi.folktells.com"
+    gatewayResources:
+      prod: "arn:aws:execute-api:ca-central-1:743418793984:*/*/admin/*"
+      dev: "arn:aws:execute-api:ca-central-1:788541814854:*/*/admin/*"
+
+provider:
+  name: aws
+  runtime: go1.x
+  cfnRole: ${self:provider.environment.stageRole}
+  stage: ${opt:stage, 'dev'}
+  versionFunctions: false
+  region: ca-central-1
+  environment:
+    stageRole: ${self:custom.myEnvironment.stageRole.${self:custom.stage}}
+    storyTableArn: ${self:custom.myEnvironment.storyTableArn.${self:custom.stage}}
+    gatewayResources: ${self:custom.myEnvironment.gatewayResources.${self:custom.stage}}
+  apiKeys:
+    - folktellsadmin-${self:provider.stage}-jwtapikey
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - ${self:provider.environment.storyTableArn}
+        - Fn::Join:
+          - '/'
+          - - ${self:provider.environment.storyTableArn}
+            - "index/*"
+    - Effect: Allow
+      Action:
+        - firehose:PutRecord
+        - firehose:PutRecordBatch
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - ssm:GetParameter
+        - ssm:PutParameter
+      Resource:
+        - Fn::Join:
+          - ''
+          -
+            - 'arn:aws:ssm:'
+            - Ref: AWS::Region
+            - ':'
+            - Ref: AWS::AccountId
+            - ':parameter/appstore/*'
+        - Fn::Join:
+          - ''
+          -
+            - 'arn:aws:ssm:'
+            - Ref: AWS::Region
+            - ':'
+            - Ref: AWS::AccountId
+            - ':parameter/twilio/*'
+        - Fn::Join:
+          - ''
+          -
+            - 'arn:aws:ssm:'
+            - Ref: AWS::Region
+            - ':'
+            - Ref: AWS::AccountId
+            - ':parameter/plivo/*'
+        - Fn::Join:
+          - ''
+          -
+            - 'arn:aws:ssm:'
+            - Ref: AWS::Region
+            - ':'
+            - Ref: AWS::AccountId
+            - ':parameter/jwe/*'
+  deploymentBucket:
+    name: folktellsadmin-${self:provider.stage}-serverlessdeploybucket
+# you can overwrite defaults here
+
+
+plugins:
+  - serverless-api-gateway-throttling
+  - serverless-iam-roles-per-function
+  - serverless-apigateway-service-proxy
+  - serverless-pseudo-parameters
+  - serverless-plugin-aws-alerts
+  - serverless-domain-manager
+
+package:
+  individually: true 
+  exclude:
+    - ./**
+
+functions:
+  passwordlessAuthorizer: 
+    handler: bin/passwordlessAuthorizer
+    package:
+      include:
+        - ./bin/passwordlessAuthorizer
+    events:
+      - http:
+          path: /admin/auth/token
+          method: get
+          cors: true 
+          private: true
+    environment:
+      storyTable: ${self:custom.storyTable}
+  jwtAuthorizer:
+    handler: bin/jwtAuthorizer
+    package:
+      include:
+        - ./bin/jwtAuthorizer
+    environment:
+      storyTable: ${self:custom.storyTable}
+      gatewayResources: ${self:provider.environment.gatewayResources}
+
+  query: 
+    handler: bin/query
+    package:
+      include:
+        - ./bin/query
+    events:
+      - http:
+          path: /admin/db/query
+          method: post
+          cors: true 
+          authorizer:
+            name: jwtAuthorizer
+            type: token
+            resultTtlInSeconds: 300
+            identitySource: method.request.header.Authorization
+    environment:
+      storyTable: ${self:custom.storyTable}
+  delete: 
+    handler: bin/delete
+    package:
+      include:
+        - ./bin/delete
+    events:
+      - http:
+          path: /admin/db/delete
+          method: post
+          cors: true 
+          authorizer:
+            name: jwtAuthorizer
+            type: token
+            resultTtlInSeconds: 300
+            identitySource: method.request.header.Authorization
+    environment:
+      storyTable: ${self:custom.storyTable}
+  authCleanup: 
+    handler: bin/authCleanup
+    package:
+      include:
+        - ./bin/authCleanup
+    events:
+      - schedule:
+          rate: rate(2 hours)
+          enabled: true
+    environment:
+      storyTable: ${self:custom.storyTable}
+
+resources:
+  Description: Admin functionality for Follktells
+  Resources:
+    GatewayResponseDefault4XX:
+      Type: 'AWS::ApiGateway::GatewayResponse'
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: 'ApiGatewayRestApi'

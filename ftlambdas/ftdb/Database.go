@@ -93,6 +93,27 @@ func PutItem(ftCtx awsproxy.FTContext, resourceID string, referenceID string, it
 	return err
 }
 
+// PutUniqueItem adds a single item to DynamoDB and ensures that there is not an
+// existing item with the same resourceID
+func PutUniqueItem(ftCtx awsproxy.FTContext, resourceID string, referenceID string, item interface{}) error {
+	itemMap, marshalError := attributevalue.MarshalMap(item)
+	if nil != marshalError {
+		return marshalError
+	}
+	itemMap[ResourceIDField] = &types.AttributeValueMemberS{Value: resourceID}
+	itemMap[ReferenceIDField] = &types.AttributeValueMemberS{Value: referenceID}
+	_, err := ftCtx.DBSvc.PutItem(ftCtx.Context, &dynamodb.PutItemInput{
+		TableName:           aws.String(GetTableName()),
+		ConditionExpression: aws.String("resourceId = :resID "),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":resID": &types.AttributeValueMemberS{Value: resourceID},
+		},
+
+		Item: itemMap,
+	})
+	return err
+}
+
 // UpdateItem updates a single item in DynamoDB
 func UpdateItem(ftCtx awsproxy.FTContext, resourceID, referenceID, updateExpression string, updates interface{}) error {
 	updateMap, marshalError := attributevalue.MarshalMap(updates)

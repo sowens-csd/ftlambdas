@@ -12,6 +12,26 @@ import (
 	"github.com/sowens-csd/ftlambdas/sharing"
 )
 
+type managedUserCreationRequest struct {
+	Name      string `json:"name" dynamodbav:"name"`
+	CreatedBy string `json:"createdBy" dynamodbav:"createdBy"`
+}
+
+func AddManagedUser(ftCtx awsproxy.FTContext, managedUserJSON string) error {
+	inputJSON := []byte(managedUserJSON)
+	var userRequest managedUserCreationRequest
+	err := json.Unmarshal(inputJSON, &userRequest)
+	if nil != err {
+		ftCtx.RequestLogger.Debug().Err(err).Msg("Error unmarshalling request")
+		return err
+	}
+	managedUser, err := sharing.AddManagedUser(ftCtx, userRequest.Name, userRequest.CreatedBy)
+	if nil != err {
+		return err
+	}
+	return ftauth.AuthorizeManagedUser(ftCtx, managedUser.ID, managedUser.CreatedBy)
+}
+
 func UpdateOrDeleteUser(ftCtx awsproxy.FTContext, onlineUserJSON string) error {
 	inputJSON := []byte(onlineUserJSON)
 	var onlineUser sharing.OnlineUser

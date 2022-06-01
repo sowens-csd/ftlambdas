@@ -17,6 +17,9 @@ const groupKeyPrefix = "G#"
 // All user records have this prefix, currently only user to user
 const userKeyPrefix = "U#"
 
+// All managed user referenceID values have this prefix, the resourceID is the userID
+const managedUserKeyPrefix = "MU#"
+
 // All story records have this prefix, currently only story to story
 const storyKeyPrefix = "S#"
 
@@ -31,6 +34,9 @@ const authRequestKeyPrefix = "AR#"
 
 // An authentication token is a verified request for a particular user
 const authTokenKeyPrefix = "AT#"
+
+// A single use authentication token used to allow a managed user to authenticate once
+const managedUserAuthKeyPrefix = "AM#"
 
 // DeleteRemove means all records related to this should be removed permanently from the DB
 const DeleteRemove = "Remove"
@@ -60,6 +66,12 @@ func ReferenceIDFromAuthRequestID(requestID string) string {
 	return authRequestKeyPrefix + requestID
 }
 
+// ResourceIDForManagedUserAuth creates a hash key from a
+// managed user ID
+func ResourceIDForManagedUserAuth(userID string) string {
+	return managedUserAuthKeyPrefix + userID
+}
+
 // ResourceIDFromEmail creates a hash key from an encrypted email
 func ResourceIDFromEmail(encryptedEmail string) string {
 	return authTokenKeyPrefix + encryptedEmail
@@ -86,9 +98,17 @@ func ReferenceIDFromGroupID(groupID string) string {
 	return groupKeyPrefix + groupID
 }
 
-// ResourceIDFromUserID creates a hash key from a groupID
+// ResourceIDFromUserID creates a hash key from a userID
 func ResourceIDFromUserID(userID string) string {
 	return userKeyPrefix + userID
+}
+
+// ResourceIDFromManagedUserID creates a hash key from a userID that is
+// for a managed user. Managed users differ from regular users in that
+// they don't have an email address and are typically provisioned by
+// someone who is not the user.
+func ResourceIDFromManagedUserID(userID string) string {
+	return managedUserKeyPrefix + userID
 }
 
 // IsUserReference returns true if the given referenceID (hash key) refers to a user
@@ -199,6 +219,10 @@ const EmailIndex = "email"
 // PhoneIndex is the secondary index that supports querying for the user with
 // a specific phone number
 const PhoneIndex = "phone"
+
+// ReferenceIDIndex is the secondary index that supports querying using any value
+// in the referenceID field
+const ReferenceIDIndex = "reference"
 
 // ----- Versioning -------
 

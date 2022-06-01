@@ -291,7 +291,6 @@ func LoadOrCreateTemporary(ctx awsproxy.FTContext, name string, email string) (*
 				return nil, saveErr
 			}
 			return &newUser, nil
-			break
 		default:
 			return nil, err
 		}
@@ -438,10 +437,9 @@ func (ou *OnlineUser) UpdateSharingSubscription(ctx awsproxy.FTContext, productI
 func (ou *OnlineUser) saveUserToDB(ctx awsproxy.FTContext) error {
 	resourceID := ftdb.ResourceIDFromUserID(ou.ID)
 	referenceID := resourceID
-	now := time.Now()
-	sec := int(now.UTC().Unix() * 1000)
+	now := now()
 	if ou.CreatedAt == 0 {
-		ou.CreatedAt = int(sec)
+		ou.CreatedAt = int(now)
 	}
 	err := ftdb.PutItem(ctx, resourceID, referenceID, ou)
 	if nil != err {
