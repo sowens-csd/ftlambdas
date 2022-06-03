@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 const requestTemplate = `

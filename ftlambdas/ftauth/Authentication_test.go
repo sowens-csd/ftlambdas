@@ -9,9 +9,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftdb"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/sharing"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

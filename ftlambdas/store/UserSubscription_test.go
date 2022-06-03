@@ -3,7 +3,7 @@ package store
 import (
 	"testing"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 func TestLoadsMatchingSubscription(t *testing.T) {
