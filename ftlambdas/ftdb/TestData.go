@@ -1,6 +1,6 @@
 package ftdb
 
-import "github.com/sowens-csd/ftlambdas/awsproxy"
+import "github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 
 const (
 	userID1       = "userID1"

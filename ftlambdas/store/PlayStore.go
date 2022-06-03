@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/sharing"
 )
 
 // see https://developers.google.com/android-publisher/api-ref/purchases/subscriptions/get for information

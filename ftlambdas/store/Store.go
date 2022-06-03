@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/sharing"
 )
 
 // AccessConfig is the information required to make requests to the play and app store

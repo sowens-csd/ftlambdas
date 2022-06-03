@@ -3,7 +3,7 @@ package notification
 import (
 	"testing"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 func TestNoContentIsAnError(t *testing.T) {

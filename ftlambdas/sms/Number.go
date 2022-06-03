@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/plivo/plivo-go"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 // AvailableNumber information about a single phone number

@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftauth"
-	"github.com/sowens-csd/ftlambdas/ftdb"
-	"github.com/sowens-csd/ftlambdas/notification"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftauth"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/notification"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/sharing"
 )
 
 type managedUserCreationRequest struct {

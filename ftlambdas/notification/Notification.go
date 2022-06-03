@@ -14,8 +14,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sns"
 	"github.com/plivo/plivo-go"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/sharing"
 )
 
 type googleCloudResult struct {

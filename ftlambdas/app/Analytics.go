@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/firehose"
 	"github.com/aws/aws-sdk-go-v2/service/firehose/types"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 // AnalyticEvent a single event from the app that describes a behaviour

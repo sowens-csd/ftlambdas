@@ -1,9 +1,9 @@
 package store
 
 import (
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftdb"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/sharing"
 )
 
 const transactionID1 = "1000000659305588"

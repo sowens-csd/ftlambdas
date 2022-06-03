@@ -4,8 +4,8 @@ import (
 	"crypto/rand"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftdb"
 )
 
 // ManagedUser is one that doesn't have an email address, usually

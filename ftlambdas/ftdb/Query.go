@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 // QueryResponse the results of performing a query

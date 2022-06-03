@@ -3,7 +3,7 @@ package ftdb
 import (
 	"testing"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 type testRecord struct {

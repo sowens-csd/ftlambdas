@@ -6,6 +6,7 @@ import (
 	"github.com/akrylysov/algnhsa"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/render"
+	"github.com/sowens-csd/ftlambdas/awsproxy"
 )
 
 // main is called when a new lambda starts, so don't
@@ -13,6 +14,7 @@ import (
 func main() {
 	// init go-chi router
 	r := chi.NewRouter()
+	r.Post("/folk", Create)
 	r.Get("/*", func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Your chi is strong"))
 	})
@@ -30,4 +32,11 @@ type apiResponse struct {
 func (a apiResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	render.Status(r, a.Status)
 	return nil
+}
+
+func Create(w http.ResponseWriter, r *http.Request) {
+	awsproxy.NewFromContext(r.Context())
+	body := r.Body
+	AddManagedUser(ftCtx, body)
+	render.Status(r, 200)
 }

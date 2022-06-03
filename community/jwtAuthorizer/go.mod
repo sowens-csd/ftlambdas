@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/aws/aws-lambda-go v1.32.0
-	github.com/sowens-csd/ftlambdas v0.0.0-20220313160211-a7b1abb84b84
+	github.com/sowens-csd/ftlambdas/ftlambdas v1.0.1
 )
 
 require (

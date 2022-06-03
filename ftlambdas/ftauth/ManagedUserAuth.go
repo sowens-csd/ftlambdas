@@ -1,8 +1,8 @@
 package ftauth
 
 import (
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftdb"
 )
 
 type managedUserAuthorization struct {

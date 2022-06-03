@@ -9,9 +9,9 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftdb"
-	"github.com/sowens-csd/ftlambdas/messaging"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/ftdb"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/messaging"
 
 	"github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi"
 	apigtypes "github.com/aws/aws-sdk-go-v2/service/apigatewaymanagementapi/types"

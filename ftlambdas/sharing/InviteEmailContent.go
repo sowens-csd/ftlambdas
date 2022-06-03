@@ -1,6 +1,6 @@
 package sharing
 
-import "github.com/sowens-csd/ftlambdas/awsproxy"
+import "github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 
 func englishNewUserInvite() awsproxy.EmailContent {
 	return awsproxy.EmailContent{

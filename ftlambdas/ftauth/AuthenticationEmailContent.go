@@ -3,7 +3,7 @@ package ftauth
 import (
 	"fmt"
 
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 // EnglishAuthCodeContent the english content for the new user welcome email

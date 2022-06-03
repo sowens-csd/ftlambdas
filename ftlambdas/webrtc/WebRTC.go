@@ -16,7 +16,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/kinesisvideo/types"
 	kvsc "github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling"
 	kvsct "github.com/aws/aws-sdk-go-v2/service/kinesisvideosignaling/types"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/ftlambdas/ftlambdas/awsproxy"
 )
 
 type WebRTCIceServer struct {
