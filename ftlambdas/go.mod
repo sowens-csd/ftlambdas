@@ -1,4 +1,4 @@
-module github.com/sowens-csd/ftlambdas
+module github.com/sowens-csd/ftlambdas/ftlambdas
 
 go 1.16
 
