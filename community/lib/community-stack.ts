@@ -27,7 +27,7 @@ export class CommunityStack extends Stack {
       actions: ['ssm:GetParameter'],
       resources: ['arn:aws:ssm:ca-central-1:788541814854:parameter/*'],
     }));
-    const apiFunction = this.buildAndInstallGOLambda(this, 'communityApiHandler', path.join(__dirname, '../api'), 'main');
+    // const apiFunction = this.buildAndInstallGOLambda(this, 'communityApiHandler', path.join(__dirname, '../api'), 'main');
     const createFunction = this.buildAndInstallGOLambda(this, 'folkCreateHandler', path.join(__dirname, '../folkCreate'), 'main');
 
     // defines an API Gateway REST API resource backed by our "hello" function.
@@ -62,9 +62,10 @@ export class CommunityStack extends Stack {
     return new lambdago.GoFunction(scope, id, {
       entry: lambdaPath,
       architecture: lambda.Architecture.X86_64,
+      runtime: lambda.Runtime.GO_1_X,
       bundling: {
         goBuildFlags: ['-ldflags "-s -w"'],
-        environment: { "GOARCH": "amd64", "GOOS": "linux" }
+        environment: environment,
       },
     });
     // return new lambda.Function(this, id, {

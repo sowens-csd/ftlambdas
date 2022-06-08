@@ -1,7 +1,8 @@
-package folkCreate
+package main
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-lambda-go/lambda"
 	folktells "github.com/sowens-csd/folktells-server"
@@ -18,6 +19,9 @@ import (
 // token is there, if it is it completes the add device cycle. If instead the
 // signup request is gone then the request was denied.
 func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, error) {
+	for keyVal, val := range request.RequestContext.Authorizer {
+		fmt.Printf("FolkCreate Handler called with claim: %s, value %s\n", keyVal, val)
+	}
 	ftCtx, errResp := awsproxy.NewFromContextAndJWT(ctx, request)
 	if nil != errResp {
 		return *errResp, nil
@@ -33,5 +37,7 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 }
 
 func main() {
+	fmt.Print("Starting FolkCreate")
 	lambda.Start(Handler)
+	fmt.Print("Started FolkCreate")
 }
