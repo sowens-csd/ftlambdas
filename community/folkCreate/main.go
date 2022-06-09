@@ -19,9 +19,6 @@ import (
 // token is there, if it is it completes the add device cycle. If instead the
 // signup request is gone then the request was denied.
 func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, error) {
-	for keyVal, val := range request.RequestContext.Authorizer {
-		fmt.Printf("FolkCreate Handler called with claim: %s, value %s\n", keyVal, val)
-	}
 	ftCtx, errResp := awsproxy.NewFromContextAndJWT(ctx, request)
 	if nil != errResp {
 		return *errResp, nil

@@ -29,6 +29,7 @@ export class CommunityStack extends Stack {
     }));
     // const apiFunction = this.buildAndInstallGOLambda(this, 'communityApiHandler', path.join(__dirname, '../api'), 'main');
     const createFunction = this.buildAndInstallGOLambda(this, 'folkCreateHandler', path.join(__dirname, '../folkCreate'), 'main');
+    this.grantDBPrivileges(createFunction);
 
     // defines an API Gateway REST API resource backed by our "hello" function.
     const httpApi = new apigw.HttpApi(this, 'CommunityHttpApi', {
@@ -63,44 +64,30 @@ export class CommunityStack extends Stack {
       entry: lambdaPath,
       architecture: lambda.Architecture.X86_64,
       runtime: lambda.Runtime.GO_1_X,
+      environment: {
+        'storyTable': 'dev-story',
+        'LOG_LEVEL': 'debug'
+      },
       bundling: {
         goBuildFlags: ['-ldflags "-s -w"'],
         environment: environment,
       },
     });
-    // return new lambda.Function(this, id, {
-    //   code: lambda.Code.fromAsset(lambdaPath, {
-    //     // bundling: {
-    //     //   image: lambda.Runtime.GO_1_X.bundlingImage,
-    //     //   user: "root",
-    //     //   environment,
-    //     //   command: [
-    //     //     'bash', '-c', [
-    //     //       'GOOS=linux go build -o /asset-output/main',
-    //     //     ].join(' && ')
-    //     //   ]
-    //     // },
-    //     bundling: {
-    //       image: lambda.Runtime.GO_1_X.bundlingImage,
-    //       local: {
-    //         tryBundle(outputDir: string) {
-    //           console.error(`Building 1`)
-    //           try {
-    //             spawnSync('go version')
-    //           } catch {
-    //             return false
-    //           }
-    //           console.error(`Building 2`)
-    //           spawnSync(`GOOS=linux go build -o ${path.join(outputDir, 'main')}`);
-    //           console.error(`Building 3`)
-    //           // new CfnOutput(scope, 'build-out', { value: stdOut.stdout.toString() });
-    //           return true
-    //         },
-    //       },
-    //     },
-    //   }),
-    //   handler,
-    //   runtime: lambda.Runtime.GO_1_X,
-    // });
+  }
+
+  grantDBPrivileges(lambdaFunction: lambda.Function) {
+    const dbPrivileges = new iam.PolicyStatement({
+      actions: [
+        'dynamodb:GetItem',
+        'dynamodb:PutItem',
+        'dynamodb:Query',
+        'dynamodb:DescribeTable',
+        'dynamodb:DeleteItem',
+        'dynamodb:UpdateItem',
+        'dynamodb:Scan',
+      ],
+      resources: ['arn:aws:dynamodb:ca-central-1:788541814854:table/dev-story'],
+    });
+    lambdaFunction.addToRolePolicy(dbPrivileges);
   }
 }
