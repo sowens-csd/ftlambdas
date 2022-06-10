@@ -1,8 +1,0 @@
-go 1.18
-
-use (
-	./community/api
-	./community/jwtAuthorizer
-	./community/folkCreate
-	./ftlambdas
-)
