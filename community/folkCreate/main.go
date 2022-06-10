@@ -24,13 +24,13 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 		return *errResp, nil
 	}
 	ftCtx.RequestLogger.Info().Msg("About to AddManagedUser")
-	err := folktells.AddManagedUser(ftCtx, string(request.Body))
+	managedUser, err := folktells.AddManagedUser(ftCtx, string(request.Body))
 	if nil != err {
 		ftCtx.RequestLogger.Info().Err(err).Msg("Error Adding ManagedUser")
 		return awsproxy.NewTextResponse(ftCtx, "failed"), nil
 	}
 	ftCtx.RequestLogger.Info().Msg("After Adding ManagedUser")
-	return awsproxy.NewSuccessResponse(ftCtx), nil
+	return awsproxy.NewJSONResponse(ftCtx, *managedUser), nil
 }
 
 func main() {
