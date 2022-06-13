@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftauth"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/ftauth"
 )
 
 func handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, error) {
