@@ -1,0 +1,1 @@
+sls deploy function --stage prod --aws-profile sls-prod-deployr2

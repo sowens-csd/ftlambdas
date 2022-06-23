@@ -1,0 +1,1 @@
+sls deploy function --stage dev --aws-profile sls-deployr2 --function $1
