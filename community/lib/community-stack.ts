@@ -25,8 +25,11 @@ export class CommunityStack extends Stack {
     });
     this.grantSSMPrivileges(jwtAuthorizer);
 
-    const createFunction = this.buildAndInstallGOLambda(this, 'folkCreateHandler', path.join(__dirname, '../folkCreate'), 'main');
-    this.grantDBPrivileges(createFunction);
+    const orgFunction = this.buildAndInstallGOLambda(this, 'orgHandler', path.join(__dirname, '../org'), 'main');
+    this.grantDBPrivileges(orgFunction);
+
+    const folkFunction = this.buildAndInstallGOLambda(this, 'folkHandler', path.join(__dirname, '../folk'), 'main');
+    this.grantDBPrivileges(folkFunction);
 
     const signupFunction = this.buildAndInstallGOLambda(this, 'signupHandler', path.join(__dirname, '../signup'), 'main');
     this.grantDBPrivileges(signupFunction);
@@ -44,12 +47,30 @@ export class CommunityStack extends Stack {
       apiName: 'CommunityHttpApi',
     });
     httpApi.addRoutes({
+      path: '/mgr/org',
+      methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunityOrgHandlerLambdaIntg',
+        orgFunction,
+      ),
+    });
+    httpApi.addRoutes({
+      path: '/mgr/org/{orgID}/{subtype}',
+      methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunityOrgHandlerLambdaIntg',
+        orgFunction,
+      ),
+    });
+    httpApi.addRoutes({
       path: '/mgr/folk',
       methods: [HttpMethod.POST],
       authorizer: authorizer,
       integration: new HttpLambdaIntegration(
-        'CommunityFolkCreateHandlerLambdaIntg',
-        createFunction,
+        'CommunityFolkHandlerLambdaIntg',
+        folkFunction,
       ),
     });
     httpApi.addRoutes({
