@@ -53,7 +53,7 @@ export class SharedStack extends Stack {
             new iam.PolicyStatement({
                 effect: iam.Effect.ALLOW,
                 principals: [mediaBucketUser],
-                actions: ['s3:PutObject', 's3:GetObject', 's3:DeleteObject', 's3:DeleteObjectTagging', 's3:PutObjectTagging', 's3:ListBucket'],
+                actions: ['s3:PutObject', 's3:PutObjectAcl', 's3:GetObject', 's3:DeleteObject', 's3:DeleteObjectTagging', 's3:PutObjectTagging'],
                 resources: [`${this.folktellsMediaBucket.bucketArn}/*`],
             }),
         );
