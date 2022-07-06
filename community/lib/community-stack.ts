@@ -11,9 +11,11 @@ import { spawnSync } from 'child_process';
 import { print } from 'util';
 import { HttpMethod } from 'aws-cdk-lib/aws-events';
 import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import { ArnPrincipal } from 'aws-cdk-lib/aws-iam';
 
 export class CommunityStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, folktellsMediaBucket: s3.Bucket, props?: StackProps) {
     super(scope, id, props);
 
     // The code that defines your stack goes here
@@ -41,6 +43,11 @@ export class CommunityStack extends Stack {
     const passwordlessAuthorizerFunction = this.buildAndInstallGOLambda(this, 'passwordlessAuthorizer', path.join(__dirname, '../passwordlessAuthorizer'), 'main');
     this.grantDBPrivileges(passwordlessAuthorizerFunction);
     this.grantSSMPrivileges(passwordlessAuthorizerFunction);
+
+    const mediaAccessFunction = this.buildAndInstallGOLambda(this, 'mediaAccess', path.join(__dirname, '../mediaAccess'), 'main');
+    this.grantSSMPrivileges(mediaAccessFunction);
+    mediaAccessFunction.addEnvironment('s3Bucket', folktellsMediaBucket.bucketName);
+    folktellsMediaBucket.grantReadWrite(mediaAccessFunction);
 
     // defines an API Gateway REST API resource 
     const httpApi = new apigw.HttpApi(this, 'CommunityHttpApi', {
@@ -71,6 +78,15 @@ export class CommunityStack extends Stack {
       integration: new HttpLambdaIntegration(
         'CommunityFolkHandlerLambdaIntg',
         folkFunction,
+      ),
+    });
+    httpApi.addRoutes({
+      path: '/mgr/media/{mediaFile}',
+      methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunityMediaAccessHandlerLambdaIntg',
+        mediaAccessFunction,
       ),
     });
     httpApi.addRoutes({

@@ -38,9 +38,12 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 	if orgID, ok := request.PathParameters[orgIDParam]; ok {
 		if hasSubtype && subtype == "folk" {
 			ftCtx.RequestLogger.Debug().Str("orgId", orgID).Msg("About to list folk in org")
-			resultArr := make([]sharing.OnlineUser, 0)
-			resultArr = append(resultArr, sharing.OnlineUser{Name: "Org User1", ID: "User1", InviteAccepted: "y", ManagedUsername: "mgx21rtu"})
-			return awsproxy.NewJSONResponse(ftCtx, folkList{Count: len(resultArr), Result: resultArr}), nil
+			managedUsers, err := sharing.FindManagedUsers(ftCtx, orgID)
+			if nil != err {
+				ftCtx.RequestLogger.Info().Str("orgID", orgID).Err(err).Msg("Error finding users")
+				return awsproxy.NewTextResponse(ftCtx, "failed"), nil
+			}
+			return awsproxy.NewJSONResponse(ftCtx, folkList{Count: len(managedUsers), Result: managedUsers}), nil
 		}
 	} else {
 		ftCtx.RequestLogger.Debug().Msg("About to list orgs")
