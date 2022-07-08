@@ -81,7 +81,7 @@ export class CommunityStack extends Stack {
       ),
     });
     httpApi.addRoutes({
-      path: '/mgr/media/{mediaFile}',
+      path: '/mgr/media/{mediaFile}/{contentType}',
       methods: [HttpMethod.GET],
       authorizer: authorizer,
       integration: new HttpLambdaIntegration(

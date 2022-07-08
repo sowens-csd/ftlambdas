@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"net/http"
@@ -68,9 +69,20 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 
 	// svc := s3.NewFromConfig(cfg)
 	// presigner := s3.NewPresignClient(svc)
-	mediaFile := request.PathParameters["mediaFile"]
+	mediaFileBytes, err := base64.URLEncoding.DecodeString(request.PathParameters["mediaFile"])
+	if err != nil {
+		ftCtx.RequestLogger.Info().Err(err).Msg("Failed to decode media file")
+		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
+	}
+	contentTypeBytes, err := base64.URLEncoding.DecodeString(request.PathParameters["contentType"])
+	if err != nil {
+		ftCtx.RequestLogger.Info().Err(err).Msg("Failed to decode content type")
+		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
+	}
+	mediaFile := string(mediaFileBytes)
+	contentType := string(contentTypeBytes)
 
-	ftCtx.RequestLogger.Debug().Int("AccessKey", len(accessToken)).Int("SecretKey", len(secretKey)).Str("mediaFile", mediaFile).Str("bucket", s3Bucket).Msg("Have params for presign")
+	ftCtx.RequestLogger.Debug().Int("AccessKey", len(accessToken)).Int("SecretKey", len(secretKey)).Str("contentType", contentType).Str("mediaFile", mediaFile).Str("bucket", s3Bucket).Msg("Have params for presign")
 	// putReq, err := presigner.PresignPutObject(ftCtx.Context, &s3.PutObjectInput{Bucket: &s3Bucket, Key: &mediaFile}, s3.WithPresignExpires(1*time.Hour))
 	// if err != nil {
 	// 	ftCtx.RequestLogger.Info().Err(err).Msg("Failed to generate pre-signed PUT url")
@@ -81,7 +93,7 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 	// 	ftCtx.RequestLogger.Info().Err(err).Msg("Failed to generate pre-signed GET url")
 	// 	return awsproxy.NewForbiddenResponse(ftCtx, "media access failed"), nil
 	// }
-	putURL, getURL, err := generateSigned(ftCtx, accessToken, secretKey, mediaFile, s3Bucket)
+	putURL, getURL, err := generateSigned(ftCtx, accessToken, secretKey, mediaFile, contentType, s3Bucket)
 	if err != nil {
 		ftCtx.RequestLogger.Info().Err(err).Msg("Failed to manually generate signed URL")
 	}
@@ -96,7 +108,7 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 	// return awsproxy.NewTextResponse(ftCtx, fmt.Sprintf("PUT:\n%s\n\nGET:\n%s\n\nManual PUT:\n%s\n\nManual GET:\n%s", putReq.URL, getReq.URL, putURL, getURL)), nil
 }
 
-func generateSigned(ftCtx awsproxy.FTContext, accessKeyID, secretKey, mediaFile, s3Bucket string) (string, string, error) {
+func generateSigned(ftCtx awsproxy.FTContext, accessKeyID, secretKey, mediaFile, contentType, s3Bucket string) (string, string, error) {
 	httpSigner := signer.NewSigner()
 	uri := fmt.Sprintf("https://sharedstack-folktellsmediabucket60d66dfa-umnguk71tkci.s3.ca-central-1.amazonaws.com/%s", url.PathEscape(mediaFile))
 	req, _ := http.NewRequest("GET", uri, nil)
@@ -130,7 +142,7 @@ func generateSigned(ftCtx awsproxy.FTContext, accessKeyID, secretKey, mediaFile,
 		"x-amz-acl":        {"public-read-write"},
 		"X-Amz-Algorithm":  {"AWS4-HMAC-SHA256"},
 	}
-	req.Header.Set("Content-Type", "application/octet-stream")
+	req.Header.Set("Content-Type", contentType)
 	req.URL.RawQuery = params.Encode()
 	putURL, _, err := httpSigner.PresignHTTP(ftCtx.Context, creds, req, "UNSIGNED-PAYLOAD", "s3", "ca-central-1", time.Now())
 	if err != nil {
