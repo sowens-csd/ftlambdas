@@ -46,6 +46,7 @@ export class CommunityStack extends Stack {
 
     const mediaAccessFunction = this.buildAndInstallGOLambda(this, 'mediaAccess', path.join(__dirname, '../mediaAccess'), 'main');
     this.grantSSMPrivileges(mediaAccessFunction);
+    this.grantDBPrivileges(mediaAccessFunction);
     mediaAccessFunction.addEnvironment('s3Bucket', folktellsMediaBucket.bucketName);
     folktellsMediaBucket.grantReadWrite(mediaAccessFunction);
 
@@ -81,8 +82,17 @@ export class CommunityStack extends Stack {
       ),
     });
     httpApi.addRoutes({
-      path: '/mgr/media/{mediaFile}/{contentType}',
+      path: '/mgr/media/{mediaCategory}/{mediaReference}',
       methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunityMediaAccessHandlerLambdaIntg',
+        mediaAccessFunction,
+      ),
+    });
+    httpApi.addRoutes({
+      path: '/mgr/media/{mediaCategory}/{mediaReference}/{contentType}',
+      methods: [HttpMethod.POST],
       authorizer: authorizer,
       integration: new HttpLambdaIntegration(
         'CommunityMediaAccessHandlerLambdaIntg',
