@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -14,12 +16,13 @@ import (
 )
 
 type scheduledItem struct {
-	ID          string     `json: "id",dynamodb:"id"`
-	Name        string     `json: "name",dynamodb:"name"`
-	Description string     `json: "description",dynamodb:"description"`
-	ScheduledAt int        `json: "scheduledAt",dynamodb:"scheduledAt"`
-	AllDay      bool       `json: "allDay",dynamodb:"allDay"`
-	Tags        []ftdb.Tag `json: "tags",dynamodb:"tags"`
+	ID             string     `json: "id",dynamodb:"id"`
+	OrganizationID string     `json: "organizationID",dynamodb:"organizationID"`
+	Name           string     `json: "name",dynamodb:"name"`
+	Description    string     `json: "description,omitempty",dynamodb:"description,omitempty"`
+	ScheduledAt    int        `json: "scheduledAt",dynamodb:"scheduledAt"`
+	AllDay         bool       `json: "allDay",dynamodb:"allDay"`
+	Tags           []ftdb.Tag `json: "tags",dynamodb:"tags"`
 }
 
 type scheduledItems struct {
@@ -40,7 +43,7 @@ func Handler(ctx context.Context, request events.APIGatewayV2HTTPRequest) (event
 	if httpRequest.Method == "GET" {
 		return getScheduledItems(ftCtx, request)
 	} else if httpRequest.Method == "POST" {
-		// return putScheduledItem(ftCtx, request)
+		return putScheduledItem(ftCtx, request)
 	}
 	// // Prepare the S3 request so a signature can be generated
 
@@ -83,15 +86,28 @@ func getScheduledItems(ftCtx awsproxy.FTContext, request events.APIGatewayV2HTTP
 	}
 	items := make([]scheduledItem, len(itemRecords))
 	for i, itemRecord := range itemRecords {
-		items[i] = scheduledItem{ID: itemRecord.ID, Name: itemRecord.Name, Description: itemRecord.Description, ScheduledAt: itemRecord.ScheduledAt, AllDay: itemRecord.AllDay, Tags: itemRecord.Tags}
+		items[i] = scheduledItem{ID: itemRecord.ID, OrganizationID: itemRecord.OrganizationID, Name: itemRecord.Name, Description: itemRecord.Description, ScheduledAt: itemRecord.ScheduledAt, AllDay: itemRecord.AllDay, Tags: itemRecord.Tags}
 	}
 	// mediaReferenceBytes, err := base64.URLEncoding.DecodeString(request.PathParameters["mediaReference"])
 	return awsproxy.NewJSONV2Response(ftCtx, scheduledItems{Items: items}), nil
 }
 
-// func putScheduledItem(ftCtx awsproxy.FTContext, request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
-
-// }
+func putScheduledItem(ftCtx awsproxy.FTContext, request events.APIGatewayV2HTTPRequest) (events.APIGatewayProxyResponse, error) {
+	body := request.Body
+	var item scheduledItem
+	err := json.Unmarshal([]byte(body), &item)
+	if nil != err {
+		awsproxy.HandleErrorV2(err, ftCtx.RequestLogger)
+	}
+	refID := "SI#" + item.ID
+	scheduledAt := time.UnixMilli(int64(item.ScheduledAt))
+	resID := ftdb.ResourceIDFromOrgAndMonth(item.OrganizationID, int(scheduledAt.Month()))
+	err = ftdb.PutItem(ftCtx, resID, refID, item)
+	if nil != err {
+		awsproxy.HandleErrorV2(err, ftCtx.RequestLogger)
+	}
+	return awsproxy.NewJSONV2Response(ftCtx, item), nil
+}
 
 func getParam(request events.APIGatewayV2HTTPRequest, paramName string) (string, error) {
 	paramBytes, err := base64.URLEncoding.DecodeString(request.PathParameters[paramName])
