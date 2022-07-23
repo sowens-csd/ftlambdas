@@ -50,6 +50,12 @@ export class CommunityStack extends Stack {
     mediaAccessFunction.addEnvironment('s3Bucket', folktellsMediaBucket.bucketName);
     folktellsMediaBucket.grantReadWrite(mediaAccessFunction);
 
+    const tagFunction = this.buildAndInstallGOLambda(this, 'tag', path.join(__dirname, '../tag'), 'main');
+    this.grantDBPrivileges(tagFunction);
+
+    const siFunction = this.buildAndInstallGOLambda(this, 'si', path.join(__dirname, '../si'), 'main');
+    this.grantDBPrivileges(siFunction);
+
     // defines an API Gateway REST API resource 
     const httpApi = new apigw.HttpApi(this, 'CommunityHttpApi', {
       apiName: 'CommunityHttpApi',
@@ -99,6 +105,54 @@ export class CommunityStack extends Stack {
         mediaAccessFunction,
       ),
     });
+
+    httpApi.addRoutes({
+      path: '/mgr/tag/{tag}/{tagReference}',
+      methods: [HttpMethod.POST],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunityTagHandlerLambdaIntg',
+        tagFunction,
+      ),
+    });
+    httpApi.addRoutes({
+      path: '/mgr/tag/{tagReference}',
+      methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunityTagHandlerLambdaIntg',
+        tagFunction,
+      ),
+    });
+
+    httpApi.addRoutes({
+      path: '/mgr/si',
+      methods: [HttpMethod.POST],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunitySIHandlerLambdaIntg',
+        siFunction,
+      ),
+    });
+    httpApi.addRoutes({
+      path: '/mgr/si/{org}/{item}',
+      methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunitySIHandlerLambdaIntg',
+        siFunction,
+      ),
+    });
+    httpApi.addRoutes({
+      path: '/mgr/si/by/{org}/{month}',
+      methods: [HttpMethod.GET],
+      authorizer: authorizer,
+      integration: new HttpLambdaIntegration(
+        'CommunitySIHandlerLambdaIntg',
+        siFunction,
+      ),
+    });
+
     httpApi.addRoutes({
       path: '/mgr/auth/signup',
       methods: [HttpMethod.POST],
