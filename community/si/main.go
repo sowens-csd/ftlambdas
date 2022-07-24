@@ -40,7 +40,12 @@ func getScheduledItems(ftCtx awsproxy.FTContext, request events.APIGatewayV2HTTP
 	if !ok {
 		return awsproxy.HandleErrorV2(fmt.Errorf("month path parameter missing"), ftCtx.RequestLogger), nil
 	}
-	scheduledItems, err := si.GetScheduledItems(ftCtx, orgID, monthParam)
+	yearParam, ok := request.PathParameters["year"]
+	if !ok {
+		return awsproxy.HandleErrorV2(fmt.Errorf("year path parameter missing"), ftCtx.RequestLogger), nil
+	}
+	ftCtx.RequestLogger.Debug().Str("orgID", orgID).Str("month", monthParam).Str("year", yearParam).Msg("get scheduled items by")
+	scheduledItems, err := si.GetScheduledItems(ftCtx, orgID, yearParam, monthParam)
 	if nil != err {
 		return awsproxy.HandleErrorV2(err, ftCtx.RequestLogger), nil
 	}

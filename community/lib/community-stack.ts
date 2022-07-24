@@ -144,7 +144,7 @@ export class CommunityStack extends Stack {
       ),
     });
     httpApi.addRoutes({
-      path: '/mgr/si/by/{org}/{month}',
+      path: '/mgr/si/by/{org}/{year}/{month}',
       methods: [HttpMethod.GET],
       authorizer: authorizer,
       integration: new HttpLambdaIntegration(
