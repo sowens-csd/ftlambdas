@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/aws/aws-lambda-go v1.33.0
-	github.com/sowens-csd/folktells-server v1.7.12
+	github.com/sowens-csd/folktells-server v1.7.13
 )
 
 require (
