@@ -107,6 +107,8 @@ github.com/sowens-csd/folktells-server v1.7.10 h1:nuISyPJmMogKKT5G9Kpmx3T7eg2vlE
 github.com/sowens-csd/folktells-server v1.7.10/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
 github.com/sowens-csd/folktells-server v1.7.11 h1:GrlXz6uAdirk1WDhRao7CUGeBFJssos14cnnUNqP/Ow=
 github.com/sowens-csd/folktells-server v1.7.11/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
+github.com/sowens-csd/folktells-server v1.7.12 h1:/n9TrKVb3eM8zjBHQgecbdwaNuyCN3XXm9bZzOxm6L0=
+github.com/sowens-csd/folktells-server v1.7.12/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=
