@@ -4,8 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	ftlambdas "github.com/sowens-csd/folktells-server"
+	"github.com/sowens-csd/folktells-server/awsproxy"
 )
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call

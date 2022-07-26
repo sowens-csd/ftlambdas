@@ -11,9 +11,9 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	uuid "github.com/satori/go.uuid"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/ftdb"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/ftdb"
+	"github.com/sowens-csd/folktells-server/sharing"
 )
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call

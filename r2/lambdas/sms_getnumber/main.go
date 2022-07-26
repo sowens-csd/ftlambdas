@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/sms"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/sms"
 )
 
 // Handler is our lambda handler invoked by the `lambda.Start` function call

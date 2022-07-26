@@ -6,8 +6,8 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/sharing"
 )
 
 // GroupMembersResponse supports paging data across multiple calls

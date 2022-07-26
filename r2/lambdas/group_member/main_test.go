@@ -8,8 +8,8 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbiface"
-	"github.com/sowens-csd/ftlambdas/ftdb"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/folktells-server/ftdb"
+	"github.com/sowens-csd/folktells-server/sharing"
 )
 
 const request1 = "request1"

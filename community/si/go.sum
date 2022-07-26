@@ -117,6 +117,16 @@ github.com/sowens-csd/folktells-server v1.7.15 h1:EFOH4lprVtZgPctwTVDmMOEoF+FcHN
 github.com/sowens-csd/folktells-server v1.7.15/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
 github.com/sowens-csd/folktells-server v1.7.16 h1:ydZT8dLKZd2N9rR4DziqGCkQ2FwdoX0Ed+F4jXk8eAU=
 github.com/sowens-csd/folktells-server v1.7.16/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
+github.com/sowens-csd/folktells-server v1.7.17 h1:+gvuVauxaL9c/jLHFjUlrPLd3hnQEVd/qilQIfSWHJg=
+github.com/sowens-csd/folktells-server v1.7.17/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
+github.com/sowens-csd/folktells-server v1.7.18 h1:LAT7SrWH/RDw5iFEr1CW0u4irG6NQIlX+QLLVHsIpXg=
+github.com/sowens-csd/folktells-server v1.7.18/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
+github.com/sowens-csd/folktells-server v1.7.19 h1:BwxCUoWqZ+NCOP3jdevaF0jryXMS31tYC0zTi5n3BQw=
+github.com/sowens-csd/folktells-server v1.7.19/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
+github.com/sowens-csd/folktells-server v1.7.20 h1:2rpFFcpeg6AS+mlkX1tv/xy7XfUwUCtNlzt4MbcQGV0=
+github.com/sowens-csd/folktells-server v1.7.20/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
+github.com/sowens-csd/folktells-server v1.7.21 h1:0hAjSMdFVM3YTO0B9gC9k7hP/NoM0FtDMaSVDdzQenM=
+github.com/sowens-csd/folktells-server v1.7.21/go.mod h1:MyubBnvg/d0VLh5UyqxXHTxTVvqOsZ/YczdoW8DN2+4=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.2.2/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXfy6kDkUVs=
 github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UVUgZn+9EI=

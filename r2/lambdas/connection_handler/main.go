@@ -5,9 +5,9 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/messaging"
-	"github.com/sowens-csd/ftlambdas/notification"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/messaging"
+	"github.com/sowens-csd/folktells-server/notification"
 )
 
 func main() {

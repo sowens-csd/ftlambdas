@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/folktells-server/sharing"
 )
 
 func TestRequestForAllGroups(t *testing.T) {

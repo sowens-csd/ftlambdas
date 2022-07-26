@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/notification"
-	"github.com/sowens-csd/ftlambdas/sharing"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/notification"
+	"github.com/sowens-csd/folktells-server/sharing"
 )
 
 // Handler is responsible for taking a signup request from a client that contains

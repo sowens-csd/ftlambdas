@@ -324,6 +324,22 @@ functions:
             identitySource: method.request.header.Authorization
     environment:
       storyTable: ${self:custom.storyTable}
+  getScheduledItems:
+    handler: bin/si
+    package:
+      include:
+        - ./bin/si
+    events:
+      - http:
+          path: si/{orgId}/{year}/{month}
+          method: get
+          authorizer:
+            name: jwtAuthorizer
+            type: token
+            resultTtlInSeconds: 300
+            identitySource: method.request.header.Authorization
+    environment:
+      storyTable: ${self:custom.storyTable}
   smsGetNumber: 
     handler: bin/sms_getnumber
     package:

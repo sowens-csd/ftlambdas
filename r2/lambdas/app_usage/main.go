@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/app"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
+	"github.com/sowens-csd/folktells-server/app"
+	"github.com/sowens-csd/folktells-server/awsproxy"
 )
 
 type versionCheckResponse struct {

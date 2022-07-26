@@ -5,8 +5,8 @@ import (
 	"net/url"
 
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/sowens-csd/ftlambdas/awsproxy"
-	"github.com/sowens-csd/ftlambdas/webrtc"
+	"github.com/sowens-csd/folktells-server/awsproxy"
+	"github.com/sowens-csd/folktells-server/webrtc"
 )
 
 // Handler takes a deviceId in the body of the request and uses it create or find a

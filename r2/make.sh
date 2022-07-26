@@ -9,6 +9,7 @@
 (cd lambdas/verify_receipt; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/verify_receipt)
 (cd lambdas/new_story; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/new_story)
 (cd lambdas/stories; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/stories)
+(cd lambdas/si; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/si)
 (cd lambdas/sms_getnumber; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/sms_getnumber)
 (cd lambdas/sms_assignnumber; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/sms_assignnumber)
 (cd lambdas/sms_receive; exec env GOOS=linux go build -ldflags="-s -w" -o ../../bin/sms_receive)
