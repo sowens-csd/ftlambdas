@@ -340,6 +340,7 @@ functions:
             identitySource: method.request.header.Authorization
     environment:
       storyTable: ${self:custom.storyTable}
+      LOG_LEVEL: "debug"
   smsGetNumber: 
     handler: bin/sms_getnumber
     package:

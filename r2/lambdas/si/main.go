@@ -16,7 +16,7 @@ func Handler(ctx context.Context, request awsproxy.Request) (awsproxy.Response, 
 	if nil != errResp {
 		return *errResp, nil
 	}
-	orgID, err := getParam(request, "org")
+	orgID, err := getParam(request, "orgId")
 	if nil != err {
 		return awsproxy.HandleError(err, ftCtx.RequestLogger), nil
 	}
